@@ -1,4 +1,5 @@
 import { resolve } from "path"
+import svgLoader from "preact-cli-svg-loader"
 
 export default (config, env, helpers, options) => {
   config.output.publicPath = ""
@@ -8,4 +9,5 @@ export default (config, env, helpers, options) => {
     config.plugins.splice(sizePlugin.index, 1)
   }
   config.devServer.host = "localhost"
+  svgLoader(config, helpers)
 }

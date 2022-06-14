@@ -1,4 +1,15 @@
 {
   "Open batch processing": "打开批量处理",
-  "Defines a shortcut for opening batch processing.": "为打开批量处理设置一个快捷键。"
+  "Controls whether to show the toolbar button.": "控制是否显示工具栏按钮。",
+  "Defines a shortcut for opening batch processing.": "为打开批量处理设置一个快捷键。",
+  "Batch processing": "批量处理",
+  "A backup is recommended before performing batch processing": "推荐在批处理前做下备份",
+  "Query": "查询",
+  "Simple": "简单",
+  "Advanced": "高级",
+  "Write down your query here.\n(and [[A]] [[B]])": "在这里写下你的查询。\n(and [[A]] [[B]])",
+  "Write down your advanced query here.\n[:find (pull ?b [*])\n :where\n [?b :block/marker _]]": "在这里写下你的高级查询。\n[:find (pull ?b [*])\n :where\n [?b :block/marker _]]",
+  "Process": "处理",
+  "Wrong query, please check.": "查询错误，请检查。",
+  "No Data": "无数据"
 }
