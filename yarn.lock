@@ -8041,6 +8041,11 @@ react-refresh@0.10.0:
   resolved "https://registry.npmmirror.com/react-refresh/-/react-refresh-0.10.0.tgz#2f536c9660c0b9b1d500684d9e52a65e7404f7e3"
   integrity sha512-PgidR3wST3dDYKr6b4pJoqQFpPGNKDSCDx4cZoshjXipw3LzO7mG1My2pwEzz2JVkF+inx3xRpDeQLFQGH/hsQ==
 
+reactutils@^5.10.0:
+  version "5.10.0"
+  resolved "https://registry.npmmirror.com/reactutils/-/reactutils-5.10.0.tgz#b6db379758b58018a3b569388a05689ed96c0ae5"
+  integrity sha512-KcSOdAYBAUVAe4PJLGeQsBhvRgDEO/2QNk2edvJ2VeDulgEfup7s+/l3Ax59GCpZvu6FIRP8hQW+SuhgmbB2bw==
+
 "readable-stream@1 || 2", readable-stream@^2.0.0, readable-stream@^2.0.1, readable-stream@^2.0.2, readable-stream@^2.1.5, readable-stream@^2.2.2, readable-stream@^2.3.3, readable-stream@^2.3.6, readable-stream@~2.3.6:
   version "2.3.7"
   resolved "https://registry.npmmirror.com/readable-stream/-/readable-stream-2.3.7.tgz#1eca1cf711aef814c04f62252a36a62f6cb23b57"

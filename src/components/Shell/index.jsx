@@ -59,7 +59,11 @@ export default function Shell({ locale }) {
         </section>
         <section ref={panelsRef} class={styles.panels}>
           {inputShown && <QueryInput onQuery={performQuery} />}
-          <QueryResult data={queryResults} onProcess={switchToProcessing} />
+          <QueryResult
+            data={queryResults}
+            onProcess={switchToProcessing}
+            onReset={reset}
+          />
           {opShown && <BatchOps onDone={reset} />}
         </section>
       </main>

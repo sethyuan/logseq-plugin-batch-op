@@ -20,7 +20,8 @@
     "antd": "^4.21.0",
     "logseq-l10n": "^0.1.0",
     "preact": "^10.7.3",
-    "preact-render-to-string": "^5.2.0"
+    "preact-render-to-string": "^5.2.0",
+    "reactutils": "^5.10.0"
   },
   "devDependencies": {
     "preact-cli": "^3.3.5",
