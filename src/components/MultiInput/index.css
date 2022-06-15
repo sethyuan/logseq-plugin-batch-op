@@ -1,0 +1,17 @@
+.container :global(input) {
+  width: calc(100% - 40px);
+}
+
+.row {
+  margin-top: 10px;
+}
+
+.row :global(.ant-btn) {
+  margin-left: 16px;
+  transform: translateY(2px);
+}
+
+.addBtn {
+  margin-top: 10px;
+  margin-bottom: 40px;
+}

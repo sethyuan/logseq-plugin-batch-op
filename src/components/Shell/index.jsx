@@ -5,7 +5,7 @@ import QueryResult from "@/components/QueryResult"
 import CloseIcon from "@/icons/close.svg"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { t } from "logseq-l10n"
-import { useState } from "preact/hooks"
+import { useRef, useState } from "preact/hooks"
 import styles from "./index.css"
 
 export default function Shell({ locale }) {
@@ -13,6 +13,7 @@ export default function Shell({ locale }) {
   const [opShown, setOpShown] = useState(false)
   const [queryResults, setQueryResults] = useState(null)
   const [panelsRef] = useAutoAnimate()
+  const lastQuery = useRef({})
 
   function hideUI() {
     logseq.hideMainUI()
@@ -20,7 +21,6 @@ export default function Shell({ locale }) {
 
   async function performQuery(mode, q) {
     try {
-      // TODO Add loading skeleton for QueryResult.
       const res =
         mode === SIMPLE
           ? await logseq.DB.q(q)
@@ -30,6 +30,8 @@ export default function Shell({ locale }) {
           ? res.filter((x) => typeof x === "object" && x.uuid)
           : [],
       )
+      lastQuery.current.mode = mode
+      lastQuery.current.q = q
     } catch (err) {
       console.error(err)
       message.error(t("Wrong query, please check."))
@@ -47,8 +49,33 @@ export default function Shell({ locale }) {
     setQueryResults(null)
   }
 
+  function deleteBlocks() {
+    // TODO impl
+    console.log("delete blocks")
+    reset()
+  }
+
+  function deleteProps(props) {
+    // TODO impl
+    console.log("delete props", props)
+    performQuery(lastQuery.current.mode, lastQuery.current.q)
+  }
+
+  function writeProps() {
+    // TODO impl
+    console.log("write props")
+  }
+
+  function replaceContent() {
+    // TODO impl
+    console.log("replace content")
+  }
+
   return (
-    <ConfigProvider locale={locale === "zh-CN" ? zhCN : undefined}>
+    <ConfigProvider
+      autoInsertSpaceInButton={false}
+      locale={locale === "zh-CN" ? zhCN : undefined}
+    >
       <main class={styles.container}>
         <section class={styles.titleBar}>
           <h1 class={styles.title}>{t("Batch processing")}</h1>
@@ -64,7 +91,15 @@ export default function Shell({ locale }) {
             onProcess={switchToProcessing}
             onReset={reset}
           />
-          {opShown && <BatchOps onDone={reset} />}
+          {opShown && (
+            <BatchOps
+              data={queryResults}
+              onDelete={deleteBlocks}
+              onDeleteProps={deleteProps}
+              onWriteProps={writeProps}
+              onReplace={replaceContent}
+            />
+          )}
         </section>
       </main>
     </ConfigProvider>

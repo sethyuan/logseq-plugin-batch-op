@@ -12,5 +12,15 @@
   "Process": "处理",
   "Reset": "重置",
   "Wrong query, please check.": "查询错误，请检查。",
-  "No Data": "无数据"
+  "No Data": "无数据",
+  "Delete": "删除",
+  "Delete Properties": "删除属性",
+  "Write Properties": "赋值属性",
+  "Replace Content": "替换内容",
+  "Delete Block/Page": "删除块/页面",
+  "Sure to delete all these blocks and pages?": "你确定要删除所有这些块和页面吗？",
+  "Yes": "是的",
+  "I'll reconsider": "我再想想",
+  "Add one": "添加一个",
+  "Property to delete": "要删除的属性"
 }
