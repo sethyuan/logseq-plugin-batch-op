@@ -1,8 +1,7 @@
 .container {
   width: 50%;
-  padding: 0 20px 20px 30px;
-  display: flex;
-  flex-flow: column nowrap;
+  height: 100%;
+  padding: 0 30px 20px 20px;
   position: relative;
 }
 
@@ -15,4 +14,12 @@
   width: 1px;
   background-color: #ccc;
   pointer-events: none;
+}
+
+.container :global(.ant-tabs) {
+  height: 100%;
+}
+
+.container :global(.ant-tabs-content-holder) {
+  overflow: auto;
 }

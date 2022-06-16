@@ -1,29 +1,19 @@
 import { Button, Empty } from "@/components/antd"
 import { t } from "logseq-l10n"
-import { useState } from "preact/hooks"
 import styles from "./index.css"
 
-const PROCESS = 1
-const RESET = 2
+export const PROCESS = 1
+export const RESET = 2
 
-export default function QueryResult({ data, onProcess, onReset }) {
-  const [mode, setMode] = useState(PROCESS)
-
-  function toggleMode() {
-    if (mode === PROCESS) {
-      setMode(RESET)
-      onProcess()
-    } else {
-      setMode(PROCESS)
-      onReset()
-    }
-  }
-
+export default function QueryResult({ data, mode, onProcess, onReset }) {
   return (
     <section class={styles.container}>
       <div class={styles.bar}>
         {data?.length > 0 && (
-          <Button type="primary" onClick={toggleMode}>
+          <Button
+            type="primary"
+            onClick={mode === PROCESS ? onProcess : onReset}
+          >
             {mode === PROCESS ? t("Process") : t("Reset")}
           </Button>
         )}
