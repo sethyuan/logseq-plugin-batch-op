@@ -1,6 +1,8 @@
 import "@/style/antd.css"
 import Button from "antd/es/button"
 import "antd/es/button/style/index.css"
+import Checkbox from "antd/es/checkbox"
+import "antd/es/checkbox/style/index.css"
 import ConfigProvider from "antd/es/config-provider"
 import Empty from "antd/es/empty"
 import "antd/es/empty/style/index.css"
@@ -25,6 +27,7 @@ import "antd/es/tabs/style/index.css"
 export {
   ConfigProvider,
   Button,
+  Checkbox,
   Input,
   Popconfirm,
   Progress,

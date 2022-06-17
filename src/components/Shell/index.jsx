@@ -14,6 +14,7 @@ export default function Shell({ locale }) {
   const [opShown, setOpShown] = useState(false)
   const [queryResultMode, setQueryResultMode] = useState(PROCESS)
   const [queryResults, setQueryResults] = useState(null)
+  const [resultsSelection, setResultsSelection] = useState(null)
   const [panelsRef] = useAutoAnimate()
   const [isLoading, setIsLoading] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -29,18 +30,34 @@ export default function Shell({ locale }) {
         mode === SIMPLE
           ? await logseq.DB.q(q)
           : await logseq.DB.datascriptQuery(q)
-      setQueryResults(
-        // Accept only blocks/pages.
-        Array.isArray(res)
-          ? res.filter((x) => typeof x === "object" && x.uuid)
-          : [],
-      )
+      // Accept only blocks and pages.
+      const results = Array.isArray(res)
+        ? res.filter((x) => typeof x === "object" && x.uuid)
+        : []
+      setQueryResults(results)
+      setResultsSelection(results.map(() => true))
     } catch (err) {
       console.error(err)
       message.error(t("Wrong query, please check."))
     } finally {
       setIsLoading(false)
     }
+  }
+
+  function changeSelection(i, value) {
+    setResultsSelection((selections) => [
+      ...selections.slice(0, i),
+      value,
+      ...selections.slice(i + 1),
+    ])
+  }
+
+  function changeSelectionForAll() {
+    setResultsSelection(
+      resultsSelection.every((v) => v)
+        ? resultsSelection.map(() => false)
+        : resultsSelection.map(() => true),
+    )
   }
 
   function switchToProcessing() {
@@ -76,8 +93,9 @@ export default function Shell({ locale }) {
   }
 
   async function deleteBlocks() {
+    const data = queryResults.filter((_, i) => resultsSelection[i])
     await Promise.all(
-      queryResults.map((block) =>
+      data.map((block) =>
         block.page != null
           ? logseq.Editor.removeBlock(block.uuid)
           : logseq.Editor.deletePage(block.name),
@@ -87,8 +105,9 @@ export default function Shell({ locale }) {
   }
 
   async function deleteProps(props) {
+    const data = queryResults.filter((_, i) => resultsSelection[i])
     await Promise.all(
-      queryResults.map((block) =>
+      data.map((block) =>
         Promise.all(
           props.map((prop) =>
             logseq.Editor.removeBlockProperty(block.uuid, prop),
@@ -100,8 +119,9 @@ export default function Shell({ locale }) {
   }
 
   async function writeProps(props) {
+    const data = queryResults.filter((_, i) => resultsSelection[i])
     await Promise.all(
-      queryResults.map((block) =>
+      data.map((block) =>
         Promise.all(
           props.map(([k, v]) =>
             logseq.Editor.upsertBlockProperty(block.uuid, k, v),
@@ -135,9 +155,12 @@ export default function Shell({ locale }) {
           <QueryResult
             loading={isLoading}
             data={queryResults}
+            selection={resultsSelection}
             mode={queryResultMode}
             onProcess={switchToProcessing}
             onReset={resetQuery}
+            onSelect={changeSelection}
+            onSelectAll={changeSelectionForAll}
           />
           {opShown && (
             <BatchOps

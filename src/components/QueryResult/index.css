@@ -23,9 +23,13 @@
 
 .bar {
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
+  justify-content: space-between;
+  align-items: flex-end;
   margin-bottom: 10px;
+}
+
+.bar :global(.ant-checkbox-wrapper) {
+  margin-left: 10px;
 }
 
 .container :global(.ant-empty) {
@@ -46,8 +50,13 @@
   position: relative;
 }
 
+.showSelection {
+  padding: 10px 10px 10px 30px;
+}
+
 .resultContent {
   margin-bottom: 4px;
+  margin-right: 14px;
 }
 
 .resultProps {
@@ -61,8 +70,14 @@
   font-weight: bold;
 }
 
+.result :global(.ant-checkbox-wrapper) {
+  position: absolute;
+  top: 10px;
+  left: 8px;
+}
+
 .hierarchy {
   position: absolute;
-  top: 3px;
-  right: 32px;
+  top: 4px;
+  right: 10px;
 }
