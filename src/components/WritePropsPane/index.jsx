@@ -1,6 +1,7 @@
 import { Button, Input, Popconfirm } from "@/components/antd"
 import { t } from "logseq-l10n"
 import { useRef, useState } from "preact/hooks"
+import { useWaitedAction } from "reactutils"
 import styles from "./index.css"
 
 const { TextArea } = Input
@@ -18,6 +19,7 @@ export default function WritePropsPane({ data, onWriteProps }) {
       .filter((fragments) => fragments.length === 2 && fragments[0])
     onWriteProps?.(props)
   }
+  const { action, duringAction } = useWaitedAction(writeProps)
 
   return (
     <div class={styles.container}>
@@ -36,9 +38,9 @@ export default function WritePropsPane({ data, onWriteProps }) {
           title={t("Sure to write these properties?")}
           okText={t("Yes")}
           cancelText={t("I'll reconsider")}
-          onConfirm={writeProps}
+          onConfirm={action}
         >
-          <Button type="primary" block>
+          <Button type="primary" block disabled={duringAction}>
             {t("Write")}
           </Button>
         </Popconfirm>

@@ -1,6 +1,6 @@
 .container {
   width: 50%;
-  padding: 10px 20px 20px 30px;
+  padding: 10px 20px 20px;
   display: flex;
   flex-flow: column nowrap;
   position: relative;
@@ -43,15 +43,11 @@
   border-radius: 2px;
   background: #fff;
   margin-bottom: 10px;
+  position: relative;
 }
 
 .resultContent {
   margin-bottom: 4px;
-  overflow : hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
 }
 
 .resultProps {
@@ -63,4 +59,10 @@
 
 .resultPropName {
   font-weight: bold;
+}
+
+.hierarchy {
+  position: absolute;
+  top: 3px;
+  right: 32px;
 }

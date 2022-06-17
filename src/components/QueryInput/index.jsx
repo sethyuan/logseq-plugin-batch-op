@@ -17,6 +17,14 @@ export default function QueryInput({ onQuery }) {
     setText("")
   }
 
+  function onKeyDown(e) {
+    // cmd+enter or ctrl+enter
+    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+      e.preventDefault()
+      onQuery?.(mode, text)
+    }
+  }
+
   return (
     <section class={styles.container}>
       <div class={styles.bar}>
@@ -42,6 +50,7 @@ export default function QueryInput({ onQuery }) {
         }
         value={text}
         onChange={(e) => setText(e.target.value)}
+        onKeyDown={onKeyDown}
       />
     </section>
   )

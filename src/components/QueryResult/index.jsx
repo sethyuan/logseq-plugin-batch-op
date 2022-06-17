@@ -1,11 +1,18 @@
-import { Button, Empty } from "@/components/antd"
+import { Button, Empty, Skeleton } from "@/components/antd"
+import HierarchyIcon from "@/icons/hierarchy.svg"
 import { t } from "logseq-l10n"
 import styles from "./index.css"
 
 export const PROCESS = 1
 export const RESET = 2
 
-export default function QueryResult({ data, mode, onProcess, onReset }) {
+export default function QueryResult({
+  loading,
+  data,
+  mode,
+  onProcess,
+  onReset,
+}) {
   return (
     <section class={styles.container}>
       <div class={styles.bar}>
@@ -20,7 +27,9 @@ export default function QueryResult({ data, mode, onProcess, onReset }) {
       </div>
 
       <div class={styles.results}>
-        {data?.length > 0 ? (
+        {loading ? (
+          <Skeleton active />
+        ) : data?.length > 0 ? (
           data.map((block) => {
             if (block.page != null) {
               return <BlockResult data={block} />
@@ -37,14 +46,17 @@ export default function QueryResult({ data, mode, onProcess, onReset }) {
 }
 
 function BlockResult({ data }) {
-  const content = data.content.replace(/\b[^:\n]+:: [^\n]+/g, "")
+  const content = data.content
+    .replace(/\b[^:\n]+:: [^\n]+\n?/g, "")
+    .replace(/:LOGBOOK:.+:END:/s, "")
   const properties = Object.entries(data.properties ?? {})
 
   return (
     <div class={styles.result}>
-      <div class={styles.resultContent} title={content}>
-        {content}
-      </div>
+      <div
+        class={styles.resultContent}
+        dangerouslySetInnerHTML={{ __html: content.replaceAll("\n", "<br>") }}
+      />
       {properties.length > 0 && (
         <div class={styles.resultProps}>
           {properties.map(([name, val]) => (
@@ -52,6 +64,12 @@ function BlockResult({ data }) {
               <span class={styles.resultPropName}>{name}</span>: {val}
             </div>
           ))}
+        </div>
+      )}
+      {/* TODO data.parent is a logseq bug, should be data.children */}
+      {data.parent?.length > 0 && (
+        <div class={styles.hierarchy} title={t("Has sub-blocks")}>
+          <HierarchyIcon width={16} height={16} />
         </div>
       )}
     </div>

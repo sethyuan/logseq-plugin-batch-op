@@ -16,6 +16,8 @@ import Progress from "antd/es/progress"
 import "antd/es/progress/style/index.css"
 import Segmented from "antd/es/segmented"
 import "antd/es/segmented/style/index.css"
+import Skeleton from "antd/es/skeleton"
+import "antd/es/skeleton/style/index.css"
 import "antd/es/style/index.css"
 import Tabs from "antd/es/tabs"
 import "antd/es/tabs/style/index.css"
@@ -27,6 +29,7 @@ export {
   Popconfirm,
   Progress,
   Segmented,
+  Skeleton,
   Empty,
   Tabs,
   message,

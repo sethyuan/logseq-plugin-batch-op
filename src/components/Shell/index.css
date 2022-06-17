@@ -4,6 +4,7 @@
   min-height: 500px;
   background-color: white;
   border-radius: 5px;
+  position: relative;
 }
 
 .titleBar {
@@ -36,4 +37,17 @@
   flex: 1 1 auto;
   margin-bottom: 0;
   color: #999;
+}
+
+.overlay {
+  position: absolute;
+  top: 50px;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: none;
+}
+
+.visible {
+  display: block;
 }

@@ -1,3 +1,7 @@
 .ant-empty-description {
   color: #00000040 !important;
 }
+
+.ant-popover-message-title {
+  max-width: 330px;
+}

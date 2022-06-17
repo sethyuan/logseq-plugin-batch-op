@@ -6,6 +6,7 @@ import CloseIcon from "@/icons/close.svg"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { t } from "logseq-l10n"
 import { useState } from "preact/hooks"
+import { cls } from "reactutils"
 import styles from "./index.css"
 
 export default function Shell({ locale }) {
@@ -14,6 +15,8 @@ export default function Shell({ locale }) {
   const [queryResultMode, setQueryResultMode] = useState(PROCESS)
   const [queryResults, setQueryResults] = useState(null)
   const [panelsRef] = useAutoAnimate()
+  const [isLoading, setIsLoading] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
 
   function hideUI() {
     logseq.hideMainUI()
@@ -21,6 +24,7 @@ export default function Shell({ locale }) {
 
   async function performQuery(mode, q) {
     try {
+      setIsLoading(true)
       const res =
         mode === SIMPLE
           ? await logseq.DB.q(q)
@@ -34,6 +38,8 @@ export default function Shell({ locale }) {
     } catch (err) {
       console.error(err)
       message.error(t("Wrong query, please check."))
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -57,42 +63,52 @@ export default function Shell({ locale }) {
     setQueryResults(newestBlocks)
   }
 
+  async function batchProcess(fn, args = []) {
+    setIsProcessing(true)
+    try {
+      await fn(...args)
+      logseq.App.showMsg(t("Batch processing finished."))
+    } catch (err) {
+      logseq.App.showMsg(err.message, "error")
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
   async function deleteBlocks() {
-    // TODO impl
-    // TODO test containing block case (one parent block is deleted first,
-    // what happens to the child block?)
-    // TODO test if `removeBlock` can delete pages.
-    // await Promise.all(queryResults.map((block) => logseq.Editor.removeBlock(block.uuid)))
+    await Promise.all(
+      queryResults.map((block) =>
+        block.page != null
+          ? logseq.Editor.removeBlock(block.uuid)
+          : logseq.Editor.deletePage(block.name),
+      ),
+    )
     resetQuery()
   }
 
   async function deleteProps(props) {
-    // TODO impl
-    console.log("delete props", props)
-    // await Promise.all(
-    //   queryResults.map((block) =>
-    //     Promise.all(
-    //       props.map((prop) =>
-    //         logseq.Editor.removeBlockProperty(block.uuid, prop),
-    //       ),
-    //     ),
-    //   ),
-    // )
+    await Promise.all(
+      queryResults.map((block) =>
+        Promise.all(
+          props.map((prop) =>
+            logseq.Editor.removeBlockProperty(block.uuid, prop),
+          ),
+        ),
+      ),
+    )
     await getNewestQueryResults()
   }
 
   async function writeProps(props) {
-    console.log("write props", props)
-    // TODO impl
-    // await Promise.all(
-    //   queryResults.map((block) =>
-    //     Promise.all(
-    //       props.map(([k, v]) =>
-    //         logseq.Editor.upsertBlockProperty(block.uuid, k, v),
-    //       ),
-    //     ),
-    //   ),
-    // )
+    await Promise.all(
+      queryResults.map((block) =>
+        Promise.all(
+          props.map(([k, v]) =>
+            logseq.Editor.upsertBlockProperty(block.uuid, k, v),
+          ),
+        ),
+      ),
+    )
     await getNewestQueryResults()
   }
 
@@ -117,6 +133,7 @@ export default function Shell({ locale }) {
         <section ref={panelsRef} class={styles.panels}>
           {inputShown && <QueryInput onQuery={performQuery} />}
           <QueryResult
+            loading={isLoading}
             data={queryResults}
             mode={queryResultMode}
             onProcess={switchToProcessing}
@@ -125,13 +142,14 @@ export default function Shell({ locale }) {
           {opShown && (
             <BatchOps
               data={queryResults}
-              onDelete={deleteBlocks}
-              onDeleteProps={deleteProps}
-              onWriteProps={writeProps}
-              onReplace={replaceContent}
+              onDelete={() => batchProcess(deleteBlocks)}
+              onDeleteProps={(...args) => batchProcess(deleteProps, args)}
+              onWriteProps={(...args) => batchProcess(writeProps, args)}
+              onReplace={(...args) => batchProcess(replaceContent, args)}
             />
           )}
         </section>
+        <div class={cls(styles.overlay, isProcessing && styles.visible)} />
       </main>
     </ConfigProvider>
   )

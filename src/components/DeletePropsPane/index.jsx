@@ -1,6 +1,7 @@
 import { Button, Input, Popconfirm } from "@/components/antd"
 import { t } from "logseq-l10n"
 import { useRef, useState } from "preact/hooks"
+import { useWaitedAction } from "reactutils"
 import styles from "./index.css"
 
 const { TextArea } = Input
@@ -16,6 +17,7 @@ export default function DeletePropsPane({ data, onDeleteProps }) {
       .filter((line) => line)
     onDeleteProps?.(props)
   }
+  const { action, duringAction } = useWaitedAction(deleteProps)
 
   return (
     <div class={styles.container}>
@@ -34,9 +36,9 @@ export default function DeletePropsPane({ data, onDeleteProps }) {
           title={t("Sure to delete these properties?")}
           okText={t("Yes")}
           cancelText={t("I'll reconsider")}
-          onConfirm={deleteProps}
+          onConfirm={action}
         >
-          <Button type="primary" block>
+          <Button type="primary" block disabled={duringAction}>
             {t("Delete")}
           </Button>
         </Popconfirm>
