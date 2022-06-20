@@ -25,7 +25,7 @@ export default function RenamePropsPane({ data, onRenameProps }) {
     <div class={styles.container}>
       <TextArea
         placeholder={t(
-          "Each line is a property to rename. E.g, to rename prop-a to prop-b:\nprop-a -> prop-b",
+          "Each line is a property to rename. E.g:\nprop-a -> prop-b",
         )}
         value={text}
         onChange={(e) => setText(e.target.value)}

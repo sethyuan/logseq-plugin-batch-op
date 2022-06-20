@@ -16,7 +16,7 @@
   "Yes": "是的",
   "I'll reconsider": "我再想想",
   "Each line is a property to delete. E.g:\nprop-a\nprop-b": "每行是一个待删除的属性。例如：\nprop-a\nprop-b",
-  "Each line is a property to rename. E.g, to rename prop-a to prop-b:\nprop-a -> prop-b": "每行是一个待重命名的属性。例如将prop-a重命名为prop-b：\nprop-a -> prop-b",
+  "Each line is a property to rename. E.g:\nprop-a -> prop-b": "每行是一个待重命名的属性。例如将prop-a重命名为prop-b：\nprop-a -> prop-b",
   "Sure to delete these properties?": "你确定要删除这些属性吗？",
   "Sure to rename these properties?": "你确定要重命名这些属性吗？",
   "Sure to write these properties?": "你确定要写入这些属性吗？",
