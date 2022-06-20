@@ -1,6 +1,7 @@
 import { Tabs } from "@/components/antd"
 import DeletePane from "@/components/DeletePane"
 import DeletePropsPane from "@/components/DeletePropsPane"
+import RenamePropsPane from "@/components/RenamePropsPane"
 import ReplaceContentPane from "@/components/ReplaceContentPane"
 import WritePropsPane from "@/components/WritePropsPane"
 import { t } from "logseq-l10n"
@@ -12,6 +13,7 @@ export default function BatchOps({
   data,
   onDelete,
   onDeleteProps,
+  onRenameProps,
   onWriteProps,
   onReplace,
 }) {
@@ -23,6 +25,9 @@ export default function BatchOps({
         </TabPane>
         <TabPane key="delete-prop" tab={t("Delete Properties")}>
           <DeletePropsPane data={data} onDeleteProps={onDeleteProps} />
+        </TabPane>
+        <TabPane key="rename-prop" tab={t("Rename Properties")}>
+          <RenamePropsPane data={data} onRenameProps={onRenameProps} />
         </TabPane>
         <TabPane key="write-prop" tab={t("Write Properties")}>
           <WritePropsPane data={data} onWriteProps={onWriteProps} />

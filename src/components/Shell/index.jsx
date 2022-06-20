@@ -83,7 +83,8 @@ export default function Shell({ locale }) {
   async function batchProcess(fn, args = []) {
     setIsProcessing(true)
     try {
-      await fn(...args)
+      const data = queryResults.filter((_, i) => resultsSelection[i])
+      await fn(data, ...args)
       logseq.App.showMsg(t("Batch processing finished."))
     } catch (err) {
       logseq.App.showMsg(err.message, "error")
@@ -92,8 +93,7 @@ export default function Shell({ locale }) {
     }
   }
 
-  async function deleteBlocks() {
-    const data = queryResults.filter((_, i) => resultsSelection[i])
+  async function deleteBlocks(data) {
     await Promise.all(
       data.map((block) =>
         block.page != null
@@ -104,8 +104,7 @@ export default function Shell({ locale }) {
     resetQuery()
   }
 
-  async function deleteProps(props) {
-    const data = queryResults.filter((_, i) => resultsSelection[i])
+  async function deleteProps(data, props) {
     await Promise.all(
       data.map((block) =>
         Promise.all(
@@ -118,8 +117,25 @@ export default function Shell({ locale }) {
     await getNewestQueryResults()
   }
 
-  async function writeProps(props) {
-    const data = queryResults.filter((_, i) => resultsSelection[i])
+  async function renameProps(data, props) {
+    await Promise.all(
+      data.map((block) =>
+        Promise.all(
+          props.map(async ([k, v]) => {
+            await logseq.Editor.removeBlockProperty(block.uuid, k)
+            await logseq.Editor.upsertBlockProperty(
+              block.uuid,
+              v,
+              block.properties[k],
+            )
+          }),
+        ),
+      ),
+    )
+    await getNewestQueryResults()
+  }
+
+  async function writeProps(data, props) {
     await Promise.all(
       data.map((block) =>
         Promise.all(
@@ -132,7 +148,7 @@ export default function Shell({ locale }) {
     await getNewestQueryResults()
   }
 
-  function replaceContent() {
+  function replaceContent(data) {
     // TODO impl
     console.log("replace content")
   }
@@ -167,6 +183,7 @@ export default function Shell({ locale }) {
               data={queryResults}
               onDelete={() => batchProcess(deleteBlocks)}
               onDeleteProps={(...args) => batchProcess(deleteProps, args)}
+              onRenameProps={(...args) => batchProcess(renameProps, args)}
               onWriteProps={(...args) => batchProcess(writeProps, args)}
               onReplace={(...args) => batchProcess(replaceContent, args)}
             />
