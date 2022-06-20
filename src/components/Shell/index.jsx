@@ -20,6 +20,7 @@ export default function Shell({ locale }) {
   const [isProcessing, setIsProcessing] = useState(false)
 
   function hideUI() {
+    resetQuery()
     logseq.hideMainUI()
   }
 
@@ -67,10 +68,15 @@ export default function Shell({ locale }) {
   }
 
   function resetQuery() {
-    setInputShown(true)
     setOpShown(false)
     setQueryResults(null)
     setQueryResultMode(PROCESS)
+    if (inputShown) {
+      setInputShown(false)
+      setTimeout(() => setInputShown(true), 0)
+    } else {
+      setInputShown(true)
+    }
   }
 
   async function getNewestQueryResults() {
