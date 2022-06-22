@@ -1,24 +1,49 @@
 import { Button, Input, Popconfirm } from "@/components/antd"
+import { ShellContext } from "@/libs/contexts"
 import { t } from "logseq-l10n"
-import { useRef, useState } from "preact/hooks"
-import { useWaitedAction } from "reactutils"
+import { useContext, useRef, useState } from "preact/hooks"
 import styles from "./index.css"
 
 const { TextArea } = Input
 
-export default function DeletePropsPane({ data, onDeleteProps }) {
+export default function DeletePropsPane() {
   const [text, setText] = useState("")
   const buttonContainerRef = useRef()
+  const { batchProcess, getNewestQueryResults } = useContext(ShellContext)
 
-  function deleteProps() {
+  const deleteProps = useCallback(
+    async (data, props) => {
+      await Promise.all(
+        data.map(async (block) => {
+          await Promise.all(
+            props.map((prop) =>
+              logseq.Editor.removeBlockProperty(block.uuid, prop),
+            ),
+          )
+          if (block.page == null) {
+            block = (await logseq.Editor.getPageBlocksTree(block.name))[0]
+            if (block == null) return
+            await Promise.all(
+              props.map((prop) =>
+                logseq.Editor.removeBlockProperty(block.uuid, prop),
+              ),
+            )
+          }
+        }),
+      )
+      await getNewestQueryResults()
+    },
+    [getNewestQueryResults],
+  )
+
+  function onDelete() {
     const props = text
       .split("\n")
       .map((line) => line.trim())
       .filter((line) => line)
-    onDeleteProps?.(props)
+    batchProcess(deleteProps, props)
     setText("")
   }
-  const { action, duringAction } = useWaitedAction(deleteProps)
 
   return (
     <div class={styles.container}>
@@ -37,9 +62,9 @@ export default function DeletePropsPane({ data, onDeleteProps }) {
           title={t("Sure to delete these properties?")}
           okText={t("Yes")}
           cancelText={t("I'll reconsider")}
-          onConfirm={action}
+          onConfirm={onDelete}
         >
-          <Button type="primary" block disabled={duringAction}>
+          <Button type="primary" block>
             {t("Delete")}
           </Button>
         </Popconfirm>

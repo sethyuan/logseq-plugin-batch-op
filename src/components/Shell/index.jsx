@@ -3,11 +3,11 @@ import BatchOps from "@/components/BatchOps"
 import QueryInput, { SIMPLE } from "@/components/QueryInput"
 import QueryResult, { PROCESS, RESET } from "@/components/QueryResult"
 import CloseIcon from "@/icons/close.svg"
+import { ShellContext } from "@/libs/contexts"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
-import produce from "immer"
 import { t } from "logseq-l10n"
-import { useCallback, useState } from "preact/hooks"
-import { cls, useStateRef } from "reactutils"
+import { useCallback, useMemo, useState } from "preact/hooks"
+import { cls } from "reactutils"
 import styles from "./index.css"
 
 export default function Shell({ locale }) {
@@ -19,8 +19,6 @@ export default function Shell({ locale }) {
   const [panelsRef] = useAutoAnimate()
   const [isLoading, setIsLoading] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
-  const [searchPattern, setSearchPattern] = useStateRef("")
-  const [searchReplacement, setSearchReplacement] = useStateRef("")
   const [currentTab, setCurrentTab] = useState("delete")
 
   function hideUI() {
@@ -95,7 +93,7 @@ export default function Shell({ locale }) {
   }, [queryResults])
 
   const batchProcess = useCallback(
-    async (fn, args = []) => {
+    async (fn, ...args) => {
       setIsProcessing(true)
       try {
         const data = queryResults.filter((_, i) => resultsSelection[i])
@@ -110,145 +108,14 @@ export default function Shell({ locale }) {
     [queryResults, resultsSelection],
   )
 
-  const deleteBlocks = useCallback(
-    async (data) => {
-      await Promise.all(
-        data.map((block) =>
-          block.page != null
-            ? logseq.Editor.removeBlock(block.uuid)
-            : logseq.Editor.deletePage(block.name),
-        ),
-      )
-      resetQuery()
-    },
-    [resetQuery],
-  )
-
-  const deleteProps = useCallback(
-    async (data, props) => {
-      await Promise.all(
-        data.map((block) =>
-          Promise.all(
-            props.map((prop) =>
-              logseq.Editor.removeBlockProperty(block.uuid, prop),
-            ),
-          ),
-        ),
-      )
-      await getNewestQueryResults()
-    },
-    [getNewestQueryResults],
-  )
-
-  const renameProps = useCallback(
-    async (data, props) => {
-      await Promise.all(
-        data.map(async (block) => {
-          await Promise.all(
-            props.map(async ([k, v]) => {
-              await logseq.Editor.removeBlockProperty(block.uuid, k)
-              await logseq.Editor.upsertBlockProperty(
-                block.uuid,
-                v,
-                block.properties[k],
-              )
-            }),
-          )
-          if (block.page == null) {
-            block = (await logseq.Editor.getPageBlocksTree(block.name))[0]
-            if (block == null) return
-            await Promise.all(
-              props.map(async ([k, v]) => {
-                await logseq.Editor.removeBlockProperty(block.uuid, k)
-                await logseq.Editor.upsertBlockProperty(
-                  block.uuid,
-                  v,
-                  block.properties[k],
-                )
-              }),
-            )
-          }
-        }),
-      )
-      await getNewestQueryResults()
-    },
-    [getNewestQueryResults],
-  )
-
-  const writeProps = useCallback(
-    async (data, props) => {
-      await Promise.all(
-        data.map((block) =>
-          Promise.all(
-            props.map(([k, v]) =>
-              logseq.Editor.upsertBlockProperty(block.uuid, k, v),
-            ),
-          ),
-        ),
-      )
-      await getNewestQueryResults()
-    },
-    [getNewestQueryResults],
-  )
-
-  const previewReplace = useCallback((pattern, replacement) => {
-    if (pattern !== searchPattern.current) {
-      setSearchPattern(pattern)
-      setQueryResults((data) =>
-        produce(data, (draft) => {
-          for (const block of draft) {
-            // Only do replacements for blocks, not pages.
-            if (block.page == null) continue
-
-            if (!pattern) {
-              if (block.searchMarkers != null) {
-                block.searchMarkers = undefined
-              }
-              continue
-            }
-
-            const patternLength = pattern.length
-            const searchMarkers = []
-            for (
-              let i = 0, matchStart = 0;
-              i < block.content.length;
-              i = matchStart + patternLength
-            ) {
-              matchStart = block.content.indexOf(pattern, i)
-              if (matchStart < 0) break
-              searchMarkers.push([matchStart, matchStart + patternLength])
-            }
-            if (searchMarkers.length > 0) {
-              block.searchMarkers = searchMarkers
-            }
-          }
-        }),
-      )
-    }
-    if (replacement !== searchReplacement.current) {
-      setSearchReplacement(replacement)
-    }
-  }, [])
-
-  const replaceContent = useCallback(
-    async (data, pattern, replacement) => {
-      if (!pattern) {
-        message.error(t("What do you want to search?"))
-        return
-      }
-
-      // Only do replacements for blocks, not pages.
-      data = data.filter((block) => block.page != null)
-
-      await Promise.all(
-        data.map((block) => {
-          const replaced = block.content.replaceAll(pattern, replacement ?? "")
-          return logseq.Editor.updateBlock(block.uuid, replaced)
-        }),
-      )
-      await getNewestQueryResults()
-    },
-    [getNewestQueryResults],
+  const contextValue = useMemo(
+    () => ({
+      batchProcess,
+      getNewestQueryResults,
+      setQueryResults,
+      resetQuery,
+    }),
+    [batchProcess, getNewestQueryResults, setQueryResults, resetQuery],
   )
 
   return (
@@ -264,33 +131,23 @@ export default function Shell({ locale }) {
           </p>
           <CloseIcon class={styles.close} onClick={hideUI} />
         </section>
-        <section ref={panelsRef} class={styles.panels}>
-          {inputShown && <QueryInput onQuery={performQuery} />}
-          <QueryResult
-            loading={isLoading}
-            data={queryResults}
-            selection={resultsSelection}
-            mode={queryResultMode}
-            onProcess={switchToProcessing}
-            onReset={resetQuery}
-            onSelect={changeSelection}
-            onSelectAll={changeSelectionForAll}
-            searchReplacement={searchReplacement.current}
-            tab={currentTab}
-          />
-          {opShown && (
-            <BatchOps
+        <ShellContext.Povider value={contextValue}>
+          <section ref={panelsRef} class={styles.panels}>
+            {inputShown && <QueryInput onQuery={performQuery} />}
+            <QueryResult
+              loading={isLoading}
               data={queryResults}
-              onTabChange={setCurrentTab}
-              onDelete={() => batchProcess(deleteBlocks)}
-              onDeleteProps={(...args) => batchProcess(deleteProps, args)}
-              onRenameProps={(...args) => batchProcess(renameProps, args)}
-              onWriteProps={(...args) => batchProcess(writeProps, args)}
-              onPreviewReplace={previewReplace}
-              onReplace={(...args) => batchProcess(replaceContent, args)}
+              selection={resultsSelection}
+              mode={queryResultMode}
+              onProcess={switchToProcessing}
+              onReset={resetQuery}
+              onSelect={changeSelection}
+              onSelectAll={changeSelectionForAll}
+              tab={currentTab}
             />
-          )}
-        </section>
+            {opShown && <BatchOps onTabChange={setCurrentTab} />}
+          </section>
+        </ShellContext.Povider>
         <div class={cls(styles.overlay, isProcessing && styles.visible)} />
       </main>
     </ConfigProvider>

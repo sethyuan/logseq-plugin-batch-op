@@ -9,37 +9,24 @@ import styles from "./index.css"
 
 const { TabPane } = Tabs
 
-export default function BatchOps({
-  data,
-  onTabChange,
-  onDelete,
-  onDeleteProps,
-  onRenameProps,
-  onWriteProps,
-  onPreviewReplace,
-  onReplace,
-}) {
+export default function BatchOps({ onTabChange }) {
   return (
     <section class={styles.container}>
       <Tabs defaultActiveKey="delete" onChange={onTabChange}>
         <TabPane key="delete" tab={t("Delete")}>
-          <DeletePane onDelete={onDelete} />
+          <DeletePane />
         </TabPane>
         <TabPane key="delete-prop" tab={t("Delete Properties")}>
-          <DeletePropsPane data={data} onDeleteProps={onDeleteProps} />
+          <DeletePropsPane />
         </TabPane>
         <TabPane key="rename-prop" tab={t("Rename Properties")}>
-          <RenamePropsPane data={data} onRenameProps={onRenameProps} />
+          <RenamePropsPane />
         </TabPane>
         <TabPane key="write-prop" tab={t("Write Properties")}>
-          <WritePropsPane data={data} onWriteProps={onWriteProps} />
+          <WritePropsPane />
         </TabPane>
         <TabPane key="replace-content" tab={t("Replace Content")}>
-          <ReplaceContentPane
-            data={data}
-            onPreviewReplace={onPreviewReplace}
-            onReplace={onReplace}
-          />
+          <ReplaceContentPane />
         </TabPane>
       </Tabs>
     </section>

@@ -1,4 +1,5 @@
 import { Button, Checkbox, Empty, Skeleton } from "@/components/antd"
+import ReplaceBlockPreview from "@/components/ReplaceBlockPreview"
 import HierarchyIcon from "@/icons/hierarchy.svg"
 import { t } from "logseq-l10n"
 import { cls } from "reactutils"
@@ -16,7 +17,6 @@ export default function QueryResult({
   onReset,
   onSelect,
   onSelectAll,
-  searchReplacement,
   tab,
 }) {
   function calcCheckAllStatus() {
@@ -64,12 +64,12 @@ export default function QueryResult({
                 <BlockResult
                   key={i}
                   data={block}
+                  rootData={data}
                   checked={selection[i]}
                   index={i}
                   onSelect={onSelect}
                   showSelection={mode === RESET}
                   tab={tab}
-                  replacement={searchReplacement}
                 />
               )
             } else {
@@ -81,6 +81,7 @@ export default function QueryResult({
                   index={i}
                   onSelect={onSelect}
                   showSelection={mode === RESET}
+                  tab={tab}
                 />
               )
             }
@@ -95,32 +96,35 @@ export default function QueryResult({
 
 function BlockResult({
   data,
+  rootData,
   checked,
   index,
   onSelect,
   showSelection,
   tab,
-  replacement,
 }) {
   const content = data.content
 
+  let view
+  if (tab === "delete-prop" && data.deletePropMarkers != null) {
+    view = null
+  } else if (tab === "rename-prop" && data.renamePropMarkers != null) {
+    view = null
+  } else if (tab === "write-prop" && data.writePropMarkers != null) {
+    view = null
+  } else if (tab === "replace-content" && data.searchMarkers != null) {
+    view = <ReplaceBlockPreview data={data} rootData={rootData} />
+  } else {
+    view = content.split("\n").map((line, i) => (
+      <p key={i} class={styles.resultContentP}>
+        {line}
+      </p>
+    ))
+  }
+
   return (
     <div class={cls(styles.result, showSelection && styles.showSelection)}>
-      <div class={styles.resultContent}>
-        {tab === "replace-content" && data.searchMarkers != null ? (
-          <MarkedContent
-            content={content}
-            markers={data.searchMarkers}
-            replacement={replacement}
-          />
-        ) : (
-          content.split("\n").map((line, i) => (
-            <p key={i} class={styles.resultContentP}>
-              {line}
-            </p>
-          ))
-        )}
-      </div>
+      <div class={styles.resultContent}>{view}</div>
       {/* TODO data.parent is a logseq bug, should be data.children */}
       {(data.children?.length || data.parent?.length) > 0 && (
         <div class={styles.hierarchy} title={t("Has sub-blocks")}>
@@ -140,18 +144,33 @@ function BlockResult({
 function PageResult({ data, checked, index, onSelect, showSelection }) {
   const properties = Object.entries(data.properties ?? {})
 
+  let view
+  if (tab === "delete-prop" && data.deletePropMarkers != null) {
+    view = null
+  } else if (tab === "rename-prop" && data.renamePropMarkers != null) {
+    view = null
+  } else if (tab === "write-prop" && data.writePropMarkers != null) {
+    view = null
+  } else {
+    view = (
+      <>
+        <div class={styles.resultContent}>{data.name}</div>
+        {properties.length > 0 && (
+          <div class={styles.resultProps}>
+            {properties.map(([name, val]) => (
+              <div>
+                <span class={styles.resultPropName}>{name}</span>: {val}
+              </div>
+            ))}
+          </div>
+        )}
+      </>
+    )
+  }
+
   return (
     <div class={cls(styles.result, showSelection && styles.showSelection)}>
-      <div class={styles.resultContent}>{data.name}</div>
-      {properties.length > 0 && (
-        <div class={styles.resultProps}>
-          {properties.map(([name, val]) => (
-            <div>
-              <span class={styles.resultPropName}>{name}</span>: {val}
-            </div>
-          ))}
-        </div>
-      )}
+      {view}
       <div class={styles.hierarchy} title={t("Has sub-blocks")}>
         <HierarchyIcon width={20} height={20} />
       </div>
@@ -163,36 +182,4 @@ function PageResult({ data, checked, index, onSelect, showSelection }) {
       )}
     </div>
   )
-}
-
-function MarkedContent({ content, markers, replacement }) {
-  let index = 0
-  const nodes = []
-
-  for (const [start, end] of markers) {
-    const raw = content.substring(index, start)
-    addLineNodes(nodes, raw)
-
-    const matched = content.substring(start, end)
-    const matchedNodes = []
-    addLineNodes(matchedNodes, matched)
-    nodes.push(<span class={styles.matched}>{matchedNodes}</span>)
-    nodes.push(<span class={styles.substitution}>{replacement}</span>)
-
-    index = end
-  }
-  const rest = content.substring(index)
-  addLineNodes(nodes, rest)
-
-  return nodes
-}
-
-function addLineNodes(nodes, str) {
-  const lines = str.split("\n")
-  for (let i = 0; i < lines.length - 1; i++) {
-    const line = lines[i]
-    nodes.push(<span>{line}</span>)
-    nodes.push(<br />)
-  }
-  nodes.push(<span>{lines[lines.length - 1]}</span>)
 }

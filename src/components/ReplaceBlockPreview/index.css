@@ -1,0 +1,8 @@
+.matched {
+  background-color: var(--matched-bg);
+  text-decoration: line-through;
+}
+
+.substitution {
+  background-color: var(--substitution-bg);
+}

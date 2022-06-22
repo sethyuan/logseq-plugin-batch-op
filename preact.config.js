@@ -8,6 +8,8 @@ export default (config, env, helpers, options) => {
   if (sizePlugin) {
     config.plugins.splice(sizePlugin.index, 1)
   }
-  config.devServer.host = "localhost"
+  if (config.devServer) {
+    config.devServer.host = "localhost"
+  }
   svgLoader(config, helpers)
 }

@@ -1,11 +1,25 @@
 import { Button, Popconfirm } from "@/components/antd"
+import { ShellContext } from "@/libs/contexts"
 import { t } from "logseq-l10n"
-import { useRef } from "preact/hooks"
-import { useWaitedAction } from "reactutils"
+import { useCallback, useContext, useRef } from "preact/hooks"
 
-export default function DeletePane({ onDelete }) {
+export default function DeletePane() {
   const containerRef = useRef()
-  const { action, duringAction } = useWaitedAction(onDelete)
+  const { batchProcess, resetQuery } = useContext(ShellContext)
+
+  const delete = useCallback(
+    async (data) => {
+      await Promise.all(
+        data.map((block) =>
+          block.page != null
+            ? logseq.Editor.removeBlock(block.uuid)
+            : logseq.Editor.deletePage(block.name),
+        ),
+      )
+      resetQuery()
+    },
+    [resetQuery],
+  )
 
   return (
     <div ref={containerRef}>
@@ -18,9 +32,9 @@ export default function DeletePane({ onDelete }) {
         okText={t("Yes")}
         cancelText={t("I'll reconsider")}
         okButtonProps={{ danger: true }}
-        onConfirm={action}
+        onConfirm={() => batchProcess(delete)}
       >
-        <Button type="primary" danger block disabled={duringAction}>
+        <Button type="primary" danger block>
           {t("Delete Block/Page")}
         </Button>
       </Popconfirm>

@@ -1,25 +1,50 @@
 import { Button, Input, Popconfirm } from "@/components/antd"
+import { ShellContext } from "@/libs/contexts"
 import { t } from "logseq-l10n"
-import { useRef, useState } from "preact/hooks"
-import { useWaitedAction } from "reactutils"
+import { useContext, useRef, useState } from "preact/hooks"
 import styles from "./index.css"
 
 const { TextArea } = Input
 
-export default function WritePropsPane({ data, onWriteProps }) {
+export default function WritePropsPane() {
   const [text, setText] = useState("")
   const buttonContainerRef = useRef()
+  const { batchProcess, getNewestQueryResults } = useContext(ShellContext)
 
-  function writeProps() {
+  const writeProps = useCallback(
+    async (data, props) => {
+      await Promise.all(
+        data.map(async (block) => {
+          await Promise.all(
+            props.map(([k, v]) =>
+              logseq.Editor.upsertBlockProperty(block.uuid, k, v),
+            ),
+          )
+          if (block.page == null) {
+            block = (await logseq.Editor.getPageBlocksTree(block.name))[0]
+            if (block == null) return
+            await Promise.all(
+              props.map(([k, v]) =>
+                logseq.Editor.upsertBlockProperty(block.uuid, k, v),
+              ),
+            )
+          }
+        }),
+      )
+      await getNewestQueryResults()
+    },
+    [getNewestQueryResults],
+  )
+
+  function onWrite() {
     const props = text
       .split("\n")
       .map((line) => line.trim())
       .filter((line) => line)
       .map((line) => line.split("::").map((fragment) => fragment.trim()))
       .filter((fragments) => fragments.length === 2 && fragments[0])
-    onWriteProps?.(props)
+    batchProcess(writeProps, props)
   }
-  const { action, duringAction } = useWaitedAction(writeProps)
 
   return (
     <div class={styles.container}>
@@ -38,9 +63,9 @@ export default function WritePropsPane({ data, onWriteProps }) {
           title={t("Sure to write these properties?")}
           okText={t("Yes")}
           cancelText={t("I'll reconsider")}
-          onConfirm={action}
+          onConfirm={onWrite}
         >
-          <Button type="primary" block disabled={duringAction}>
+          <Button type="primary" block>
             {t("Write")}
           </Button>
         </Popconfirm>
