@@ -63,7 +63,7 @@ export default function Shell({ locale }) {
         ? resultsSelection.map(() => false)
         : resultsSelection.map(() => true),
     )
-  }, [])
+  }, [resultsSelection])
 
   const switchToProcessing = useCallback(() => {
     setInputShown(false)
@@ -85,7 +85,11 @@ export default function Shell({ locale }) {
 
   const getNewestQueryResults = useCallback(async () => {
     const newestBlocks = await Promise.all(
-      queryResults.map((block) => logseq.Editor.getBlock(block.uuid)),
+      queryResults.map((block) =>
+        block.page != null
+          ? logseq.Editor.getBlock(block.uuid)
+          : logseq.Editor.getPage(block.name),
+      ),
     )
     setQueryResults(newestBlocks)
   }, [queryResults])
@@ -139,8 +143,8 @@ export default function Shell({ locale }) {
   const renameProps = useCallback(
     async (data, props) => {
       await Promise.all(
-        data.map((block) =>
-          Promise.all(
+        data.map(async (block) => {
+          await Promise.all(
             props.map(async ([k, v]) => {
               await logseq.Editor.removeBlockProperty(block.uuid, k)
               await logseq.Editor.upsertBlockProperty(
@@ -149,8 +153,22 @@ export default function Shell({ locale }) {
                 block.properties[k],
               )
             }),
-          ),
-        ),
+          )
+          if (block.page == null) {
+            block = (await logseq.Editor.getPageBlocksTree(block.name))[0]
+            if (block == null) return
+            await Promise.all(
+              props.map(async ([k, v]) => {
+                await logseq.Editor.removeBlockProperty(block.uuid, k)
+                await logseq.Editor.upsertBlockProperty(
+                  block.uuid,
+                  v,
+                  block.properties[k],
+                )
+              }),
+            )
+          }
+        }),
       )
       await getNewestQueryResults()
     },

@@ -103,7 +103,6 @@ function BlockResult({
   replacement,
 }) {
   const content = data.content
-  const properties = Object.entries(data.properties ?? {})
 
   return (
     <div class={cls(styles.result, showSelection && styles.showSelection)}>

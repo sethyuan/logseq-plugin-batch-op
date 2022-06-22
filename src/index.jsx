@@ -48,7 +48,7 @@ export default function App() {
 
       if (logseq.settings?.showButton ?? true) {
         logseq.App.registerUIItem("toolbar", {
-          key: `kef-batchop-tb`,
+          key: `batch-operations`,
           template: `<a class="kef-batchop-icon" data-on-click="showUI" title="${t(
             "Batch processing",
           )}">${BatchSvg}</a>`,
