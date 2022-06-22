@@ -1,3 +1,8 @@
+:root {
+  --matched-bg: #ffaeae;
+  --substitution-bg: #acf7ac;
+}
+
 body {
   display: flex;
   justify-content: center;

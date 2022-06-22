@@ -18,6 +18,7 @@ export default function RenamePropsPane({ data, onRenameProps }) {
       .map((line) => line.split("->").map((fragment) => fragment.trim()))
       .filter((fragments) => fragments.length === 2 && fragments[0])
     onRenameProps?.(props)
+    setText("")
   }
   const { action, duringAction } = useWaitedAction(renameProps)
 

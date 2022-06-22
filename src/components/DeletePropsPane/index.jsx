@@ -16,6 +16,7 @@ export default function DeletePropsPane({ data, onDeleteProps }) {
       .map((line) => line.trim())
       .filter((line) => line)
     onDeleteProps?.(props)
+    setText("")
   }
   const { action, duringAction } = useWaitedAction(deleteProps)
 

@@ -7,6 +7,7 @@
   "Delete": "删除",
   "Rename": "重命名",
   "Write": "删除",
+  "Replace": "替换",
   "Delete Properties": "删除属性",
   "Rename Properties": "重命名属性",
   "Write Properties": "赋值属性",
@@ -20,6 +21,7 @@
   "Sure to delete these properties?": "你确定要删除这些属性吗？",
   "Sure to rename these properties?": "你确定要重命名这些属性吗？",
   "Sure to write these properties?": "你确定要写入这些属性吗？",
+  "Sure to make these replacements?": "你确定要做这些替换吗？",
   "Simple": "简单",
   "Advanced": "高级",
   "Query": "查询",
@@ -30,5 +32,8 @@
   "Wrong query, please check.": "查询错误，请检查。",
   "No Data": "无数据",
   "Has sub-blocks": "有子块",
-  "All": "全选"
+  "All": "全选",
+  "Search: ": "搜索：",
+  "Replace: ": "替换：",
+  "What do you want to search?": "你要查找什么？"
 }

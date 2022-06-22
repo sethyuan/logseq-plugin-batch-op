@@ -11,15 +11,17 @@ const { TabPane } = Tabs
 
 export default function BatchOps({
   data,
+  onTabChange,
   onDelete,
   onDeleteProps,
   onRenameProps,
   onWriteProps,
+  onPreviewReplace,
   onReplace,
 }) {
   return (
     <section class={styles.container}>
-      <Tabs defaultActiveKey="delete">
+      <Tabs defaultActiveKey="delete" onChange={onTabChange}>
         <TabPane key="delete" tab={t("Delete")}>
           <DeletePane onDelete={onDelete} />
         </TabPane>
@@ -33,7 +35,11 @@ export default function BatchOps({
           <WritePropsPane data={data} onWriteProps={onWriteProps} />
         </TabPane>
         <TabPane key="replace-content" tab={t("Replace Content")}>
-          <ReplaceContentPane data={data} onReplace={onReplace} />
+          <ReplaceContentPane
+            data={data}
+            onPreviewReplace={onPreviewReplace}
+            onReplace={onReplace}
+          />
         </TabPane>
       </Tabs>
     </section>

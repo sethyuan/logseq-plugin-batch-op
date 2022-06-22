@@ -1,0 +1,7 @@
+.container :global(input) {
+  margin-bottom: 10px;
+}
+
+.container :global(button) {
+  margin-top: 10px;
+}

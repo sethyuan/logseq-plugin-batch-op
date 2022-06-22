@@ -16,3 +16,9 @@
   flex: 1;
   font-family: Consolas, Monaco, Menlo, Courier, monospace;
 }
+
+.shortcut {
+  margin-right: 8px;
+  color: #888;
+  font-size: 0.9em;
+}

@@ -4,9 +4,10 @@ import QueryInput, { SIMPLE } from "@/components/QueryInput"
 import QueryResult, { PROCESS, RESET } from "@/components/QueryResult"
 import CloseIcon from "@/icons/close.svg"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
+import produce from "immer"
 import { t } from "logseq-l10n"
-import { useState } from "preact/hooks"
-import { cls } from "reactutils"
+import { useCallback, useState } from "preact/hooks"
+import { cls, useStateRef } from "reactutils"
 import styles from "./index.css"
 
 export default function Shell({ locale }) {
@@ -18,13 +19,16 @@ export default function Shell({ locale }) {
   const [panelsRef] = useAutoAnimate()
   const [isLoading, setIsLoading] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [searchPattern, setSearchPattern] = useStateRef("")
+  const [searchReplacement, setSearchReplacement] = useStateRef("")
+  const [currentTab, setCurrentTab] = useState("delete")
 
   function hideUI() {
     resetQuery()
     logseq.hideMainUI()
   }
 
-  async function performQuery(mode, q) {
+  const performQuery = useCallback(async (mode, q) => {
     try {
       setIsLoading(true)
       const res =
@@ -43,31 +47,31 @@ export default function Shell({ locale }) {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
 
-  function changeSelection(i, value) {
+  const changeSelection = useCallback((i, value) => {
     setResultsSelection((selections) => [
       ...selections.slice(0, i),
       value,
       ...selections.slice(i + 1),
     ])
-  }
+  }, [])
 
-  function changeSelectionForAll() {
+  const changeSelectionForAll = useCallback(() => {
     setResultsSelection(
       resultsSelection.every((v) => v)
         ? resultsSelection.map(() => false)
         : resultsSelection.map(() => true),
     )
-  }
+  }, [])
 
-  function switchToProcessing() {
+  const switchToProcessing = useCallback(() => {
     setInputShown(false)
     setOpShown(true)
     setQueryResultMode(RESET)
-  }
+  }, [])
 
-  function resetQuery() {
+  const resetQuery = useCallback(() => {
     setOpShown(false)
     setQueryResults(null)
     setQueryResultMode(PROCESS)
@@ -77,87 +81,157 @@ export default function Shell({ locale }) {
     } else {
       setInputShown(true)
     }
-  }
+  }, [inputShown])
 
-  async function getNewestQueryResults() {
+  const getNewestQueryResults = useCallback(async () => {
     const newestBlocks = await Promise.all(
       queryResults.map((block) => logseq.Editor.getBlock(block.uuid)),
     )
     setQueryResults(newestBlocks)
-  }
+  }, [queryResults])
 
-  async function batchProcess(fn, args = []) {
-    setIsProcessing(true)
-    try {
-      const data = queryResults.filter((_, i) => resultsSelection[i])
-      await fn(data, ...args)
-      logseq.App.showMsg(t("Batch processing finished."))
-    } catch (err) {
-      logseq.App.showMsg(err.message, "error")
-    } finally {
-      setIsProcessing(false)
+  const batchProcess = useCallback(
+    async (fn, args = []) => {
+      setIsProcessing(true)
+      try {
+        const data = queryResults.filter((_, i) => resultsSelection[i])
+        await fn(data, ...args)
+        logseq.App.showMsg(t("Batch processing finished."))
+      } catch (err) {
+        logseq.App.showMsg(err.message, "error")
+      } finally {
+        setIsProcessing(false)
+      }
+    },
+    [queryResults, resultsSelection],
+  )
+
+  const deleteBlocks = useCallback(
+    async (data) => {
+      await Promise.all(
+        data.map((block) =>
+          block.page != null
+            ? logseq.Editor.removeBlock(block.uuid)
+            : logseq.Editor.deletePage(block.name),
+        ),
+      )
+      resetQuery()
+    },
+    [resetQuery],
+  )
+
+  const deleteProps = useCallback(
+    async (data, props) => {
+      await Promise.all(
+        data.map((block) =>
+          Promise.all(
+            props.map((prop) =>
+              logseq.Editor.removeBlockProperty(block.uuid, prop),
+            ),
+          ),
+        ),
+      )
+      await getNewestQueryResults()
+    },
+    [getNewestQueryResults],
+  )
+
+  const renameProps = useCallback(
+    async (data, props) => {
+      await Promise.all(
+        data.map((block) =>
+          Promise.all(
+            props.map(async ([k, v]) => {
+              await logseq.Editor.removeBlockProperty(block.uuid, k)
+              await logseq.Editor.upsertBlockProperty(
+                block.uuid,
+                v,
+                block.properties[k],
+              )
+            }),
+          ),
+        ),
+      )
+      await getNewestQueryResults()
+    },
+    [getNewestQueryResults],
+  )
+
+  const writeProps = useCallback(
+    async (data, props) => {
+      await Promise.all(
+        data.map((block) =>
+          Promise.all(
+            props.map(([k, v]) =>
+              logseq.Editor.upsertBlockProperty(block.uuid, k, v),
+            ),
+          ),
+        ),
+      )
+      await getNewestQueryResults()
+    },
+    [getNewestQueryResults],
+  )
+
+  const previewReplace = useCallback((pattern, replacement) => {
+    if (pattern !== searchPattern.current) {
+      setSearchPattern(pattern)
+      setQueryResults((data) =>
+        produce(data, (draft) => {
+          for (const block of draft) {
+            // Only do replacements for blocks, not pages.
+            if (block.page == null) continue
+
+            if (!pattern) {
+              if (block.searchMarkers != null) {
+                block.searchMarkers = undefined
+              }
+              continue
+            }
+
+            const patternLength = pattern.length
+            const searchMarkers = []
+            for (
+              let i = 0, matchStart = 0;
+              i < block.content.length;
+              i = matchStart + patternLength
+            ) {
+              matchStart = block.content.indexOf(pattern, i)
+              if (matchStart < 0) break
+              searchMarkers.push([matchStart, matchStart + patternLength])
+            }
+            if (searchMarkers.length > 0) {
+              block.searchMarkers = searchMarkers
+            }
+          }
+        }),
+      )
     }
-  }
+    if (replacement !== searchReplacement.current) {
+      setSearchReplacement(replacement)
+    }
+  }, [])
 
-  async function deleteBlocks(data) {
-    await Promise.all(
-      data.map((block) =>
-        block.page != null
-          ? logseq.Editor.removeBlock(block.uuid)
-          : logseq.Editor.deletePage(block.name),
-      ),
-    )
-    resetQuery()
-  }
+  const replaceContent = useCallback(
+    async (data, pattern, replacement) => {
+      if (!pattern) {
+        message.error(t("What do you want to search?"))
+        return
+      }
 
-  async function deleteProps(data, props) {
-    await Promise.all(
-      data.map((block) =>
-        Promise.all(
-          props.map((prop) =>
-            logseq.Editor.removeBlockProperty(block.uuid, prop),
-          ),
-        ),
-      ),
-    )
-    await getNewestQueryResults()
-  }
+      // Only do replacements for blocks, not pages.
+      data = data.filter((block) => block.page != null)
 
-  async function renameProps(data, props) {
-    await Promise.all(
-      data.map((block) =>
-        Promise.all(
-          props.map(async ([k, v]) => {
-            await logseq.Editor.removeBlockProperty(block.uuid, k)
-            await logseq.Editor.upsertBlockProperty(
-              block.uuid,
-              v,
-              block.properties[k],
-            )
-          }),
-        ),
-      ),
-    )
-    await getNewestQueryResults()
-  }
-
-  async function writeProps(data, props) {
-    await Promise.all(
-      data.map((block) =>
-        Promise.all(
-          props.map(([k, v]) =>
-            logseq.Editor.upsertBlockProperty(block.uuid, k, v),
-          ),
-        ),
-      ),
-    )
-    await getNewestQueryResults()
-  }
-
-  function replaceContent(data) {
-    // TODO impl
-    console.log("replace content")
-  }
+      await Promise.all(
+        data.map((block) => {
+          const replaced = block.content.replaceAll(pattern, replacement ?? "")
+          return logseq.Editor.updateBlock(block.uuid, replaced)
+        }),
+      )
+      await getNewestQueryResults()
+    },
+    [getNewestQueryResults],
+  )
 
   return (
     <ConfigProvider
@@ -183,14 +257,18 @@ export default function Shell({ locale }) {
             onReset={resetQuery}
             onSelect={changeSelection}
             onSelectAll={changeSelectionForAll}
+            searchReplacement={searchReplacement.current}
+            tab={currentTab}
           />
           {opShown && (
             <BatchOps
               data={queryResults}
+              onTabChange={setCurrentTab}
               onDelete={() => batchProcess(deleteBlocks)}
               onDeleteProps={(...args) => batchProcess(deleteProps, args)}
               onRenameProps={(...args) => batchProcess(renameProps, args)}
               onWriteProps={(...args) => batchProcess(writeProps, args)}
+              onPreviewReplace={previewReplace}
               onReplace={(...args) => batchProcess(replaceContent, args)}
             />
           )}

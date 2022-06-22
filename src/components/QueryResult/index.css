@@ -1,6 +1,6 @@
 .container {
   width: 50%;
-  padding: 10px 20px 20px;
+  padding: 10px 0 20px;
   display: flex;
   flex-flow: column nowrap;
   position: relative;
@@ -26,6 +26,7 @@
   justify-content: space-between;
   align-items: flex-end;
   margin-bottom: 10px;
+  padding: 0 20px;
 }
 
 .bar :global(.ant-checkbox-wrapper) {
@@ -39,6 +40,7 @@
 .results {
   flex: 1 0 0%;
   overflow: auto;
+  padding: 0 20px;
 }
 
 .result {
@@ -57,6 +59,10 @@
 .resultContent {
   margin-bottom: 4px;
   margin-right: 14px;
+}
+
+.resultContentP {
+  margin: 0;
 }
 
 .resultProps {
@@ -80,4 +86,13 @@
   position: absolute;
   top: 4px;
   right: 10px;
+}
+
+.matched {
+  background-color: var(--matched-bg);
+  text-decoration: line-through;
+}
+
+.substitution {
+  background-color: var(--substitution-bg);
 }

@@ -36,9 +36,16 @@ export default function QueryInput({ onQuery }) {
           value={mode}
           onChange={onSwitchMode}
         />
-        <Button type="primary" onClick={() => onQuery?.(mode, text)}>
-          {t("Query")}
-        </Button>
+        <div>
+          <span class={styles.shortcut}>cmd/ctrl + enter</span>
+          <Button
+            type="primary"
+            title="mod+enter"
+            onClick={() => onQuery?.(mode, text)}
+          >
+            {t("Query")}
+          </Button>
+        </div>
       </div>
       <TextArea
         placeholder={
