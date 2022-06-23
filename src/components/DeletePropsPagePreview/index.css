@@ -1,0 +1,8 @@
+.propName {
+  font-weight: bold;
+}
+
+.todelete {
+  color: var(--delete-fg);
+  text-decoration: line-through;
+}

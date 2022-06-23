@@ -1,16 +1,66 @@
 import { Button, Input, Popconfirm } from "@/components/antd"
 import { ShellContext } from "@/libs/contexts"
+import produce from "immer"
 import { t } from "logseq-l10n"
-import { useCallback, useContext, useRef, useState } from "preact/hooks"
-import { useCompositionChange } from "reactutils"
+import { useCallback, useContext, useRef } from "preact/hooks"
+import { debounce } from "rambdax"
+import { useCompositionChange, useStateRef } from "reactutils"
 import styles from "./index.css"
 
 const { TextArea } = Input
 
 export default function DeletePropsPane() {
-  const [text, setText] = useState("")
+  const [text, setText] = useStateRef("")
   const buttonContainerRef = useRef()
-  const { batchProcess, getNewestQueryResults } = useContext(ShellContext)
+  const { batchProcess, getNewestQueryResults, setQueryResults } =
+    useContext(ShellContext)
+
+  const preview = useCallback(
+    debounce(() => {
+      const props = new Set(
+        text.current
+          .split("\n")
+          .map((line) => line.trim())
+          .filter((line) => line),
+      )
+
+      setQueryResults((data) =>
+        produce(data, (draft) => {
+          for (const block of draft) {
+            const markers = new Set()
+            if (block.page != null) {
+              // it's a block
+              const lines = block.content.split("\n")
+              for (let i = 0; i < lines.length; i++) {
+                const line = lines[i]
+                for (const prop of props) {
+                  if (line.startsWith(`${prop}::`)) {
+                    markers.add(i)
+                    break
+                  }
+                }
+              }
+            } else {
+              // it's a page
+              const properties = Object.entries(block.properties ?? {})
+              for (let i = 0; i < properties.length; i++) {
+                const [property] = properties[i]
+                if (props.has(property)) {
+                  markers.add(i)
+                }
+              }
+            }
+            if (markers.size > 0) {
+              block.deletePropMarkers = markers
+            } else {
+              block.deletePropMarkers = undefined
+            }
+          }
+        }),
+      )
+    }, 500),
+    [],
+  )
 
   const deleteProps = useCallback(
     async (data, props) => {
@@ -38,7 +88,7 @@ export default function DeletePropsPane() {
   )
 
   function onDelete() {
-    const props = text
+    const props = text.current
       .split("\n")
       .map((line) => line.trim())
       .filter((line) => line)
@@ -46,7 +96,10 @@ export default function DeletePropsPane() {
     setText("")
   }
 
-  const textareaProps = useCompositionChange((e) => setText(e.target.value))
+  const textareaProps = useCompositionChange((e) => {
+    setText(e.target.value)
+    preview()
+  })
 
   return (
     <div class={styles.container}>
@@ -54,7 +107,7 @@ export default function DeletePropsPane() {
         placeholder={t(
           "Each line is a property to delete. E.g:\nprop-a\nprop-b",
         )}
-        value={text}
+        value={text.current}
         {...textareaProps}
         autoSize={{ minRows: 3 }}
       />

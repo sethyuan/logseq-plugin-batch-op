@@ -1,0 +1,8 @@
+.p {
+  margin: 0;
+}
+
+.todelete {
+  color: var(--delete-fg);
+  text-decoration: line-through;
+}

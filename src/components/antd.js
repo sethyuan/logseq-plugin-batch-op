@@ -1,4 +1,6 @@
 import "@/style/antd.css"
+import Alert from "antd/es/alert"
+import "antd/es/alert/style/index.css"
 import Button from "antd/es/button"
 import "antd/es/button/style/index.css"
 import Checkbox from "antd/es/checkbox"
@@ -26,6 +28,7 @@ import "antd/es/tabs/style/index.css"
 
 export {
   ConfigProvider,
+  Alert,
   Button,
   Checkbox,
   Input,

@@ -1,4 +1,4 @@
-import { Button, Input, message, Popconfirm } from "@/components/antd"
+import { Alert, Button, Input, message, Popconfirm } from "@/components/antd"
 import { ShellContext } from "@/libs/contexts"
 import produce from "immer"
 import { t } from "logseq-l10n"
@@ -16,7 +16,7 @@ export default function ReplaceContentPane() {
   const { batchProcess, getNewestQueryResults, setQueryResults } =
     useContext(ShellContext)
 
-  const previewReplace = useCallback(
+  const preview = useCallback(
     debounce(() => {
       const pattern = patternText.current
       const replacement = replacementText.current
@@ -95,16 +95,20 @@ export default function ReplaceContentPane() {
 
   const patternChangeProps = useCompositionChange((e) => {
     setPatternText(e.target.value)
-    previewReplace()
+    preview()
   })
 
   const replacementChangeProps = useCompositionChange((e) => {
     setReplacementText(e.target.value)
-    previewReplace()
+    preview()
   })
 
   return (
     <div class={styles.container}>
+      <Alert
+        type="info"
+        message={t("NOTE: Can only work agains normal blocks, not pages.")}
+      />
       <div>{t("Search: ")}</div>
       <Input value={patternText.current} {...patternChangeProps} />
       <div>{t("Replace: ")}</div>

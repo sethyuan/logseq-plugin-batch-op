@@ -3,6 +3,12 @@ import ReplaceBlockPreview from "@/components/ReplaceBlockPreview"
 import HierarchyIcon from "@/icons/hierarchy.svg"
 import { t } from "logseq-l10n"
 import { cls } from "reactutils"
+import DeletePropsBlockPreview from "../DeletePropsBlockPreview"
+import DeletePropsPagePreview from "../DeletePropsPagePreview"
+import RenamePropsBlockPreview from "../RenamePropsBlockPreview"
+import RenamePropsPagePreview from "../RenamePropsPagePreview"
+import WritePropsBlockPreview from "../WritePropsBlockPreview"
+import WritePropsPagePreview from "../WritePropsPagePreview"
 import styles from "./index.css"
 
 export const PROCESS = 1
@@ -107,11 +113,11 @@ function BlockResult({
 
   let view
   if (tab === "delete-prop" && data.deletePropMarkers != null) {
-    view = null
+    view = <DeletePropsBlockPreview data={data} />
   } else if (tab === "rename-prop" && data.renamePropMarkers != null) {
-    view = null
+    view = <RenamePropsBlockPreview data={data} />
   } else if (tab === "write-prop" && data.writePropMarkers != null) {
-    view = null
+    view = <WritePropsBlockPreview data={data} />
   } else if (tab === "replace-content" && data.searchMarkers != null) {
     view = <ReplaceBlockPreview data={data} rootData={rootData} />
   } else {
@@ -141,36 +147,30 @@ function BlockResult({
   )
 }
 
-function PageResult({ data, checked, index, onSelect, showSelection }) {
+function PageResult({ data, checked, index, onSelect, showSelection, tab }) {
   const properties = Object.entries(data.properties ?? {})
 
   let view
   if (tab === "delete-prop" && data.deletePropMarkers != null) {
-    view = null
+    view = <DeletePropsPagePreview data={data} />
   } else if (tab === "rename-prop" && data.renamePropMarkers != null) {
-    view = null
+    view = <RenamePropsPagePreview data={data} />
   } else if (tab === "write-prop" && data.writePropMarkers != null) {
-    view = null
+    view = <WritePropsPagePreview data={data} />
   } else {
-    view = (
-      <>
-        <div class={styles.resultContent}>{data.name}</div>
-        {properties.length > 0 && (
-          <div class={styles.resultProps}>
-            {properties.map(([name, val]) => (
-              <div>
-                <span class={styles.resultPropName}>{name}</span>: {val}
-              </div>
-            ))}
-          </div>
-        )}
-      </>
-    )
+    view = properties.map(([name, val], i) => (
+      <div key={i}>
+        <span class={styles.resultPropName}>{name}</span>: {val}
+      </div>
+    ))
   }
 
   return (
     <div class={cls(styles.result, showSelection && styles.showSelection)}>
-      {view}
+      <>
+        <div class={styles.resultContent}>{data.name}</div>
+        {properties.length > 0 && <div class={styles.resultProps}>{view}</div>}
+      </>
       <div class={styles.hierarchy} title={t("Has sub-blocks")}>
         <HierarchyIcon width={20} height={20} />
       </div>

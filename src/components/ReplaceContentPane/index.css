@@ -5,3 +5,7 @@
 .container :global(button) {
   margin-top: 10px;
 }
+
+.container :global(.ant-alert) {
+  margin-bottom: 20px;
+}

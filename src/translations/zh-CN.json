@@ -35,5 +35,6 @@
   "All": "全选",
   "Search: ": "搜索：",
   "Replace: ": "替换：",
-  "What do you want to search?": "你要查找什么？"
+  "What do you want to search?": "你要查找什么？",
+  "NOTE: Can only work agains normal blocks, not pages.": "注意：只能用于普通块，页面不适用。"
 }

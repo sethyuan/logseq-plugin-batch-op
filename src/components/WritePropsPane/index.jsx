@@ -1,16 +1,90 @@
 import { Button, Input, Popconfirm } from "@/components/antd"
 import { ShellContext } from "@/libs/contexts"
+import produce from "immer"
 import { t } from "logseq-l10n"
-import { useCallback, useContext, useRef, useState } from "preact/hooks"
-import { useCompositionChange } from "reactutils"
+import { useCallback, useContext, useRef } from "preact/hooks"
+import { debounce } from "rambdax"
+import { useCompositionChange, useStateRef } from "reactutils"
 import styles from "./index.css"
 
 const { TextArea } = Input
 
 export default function WritePropsPane() {
-  const [text, setText] = useState("")
+  const [text, setText] = useStateRef("")
   const buttonContainerRef = useRef()
-  const { batchProcess, getNewestQueryResults } = useContext(ShellContext)
+  const { batchProcess, getNewestQueryResults, setQueryResults } =
+    useContext(ShellContext)
+
+  const preview = useCallback(
+    debounce(() => {
+      const props = text.current
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => line)
+        .map((line) => line.split("::").map((fragment) => fragment.trim()))
+        .filter((fragments) => fragments.length === 2 && fragments[0])
+        .reduce((obj, [name, value]) => {
+          obj[name] = value
+          return obj
+        }, {})
+
+      setQueryResults((data) =>
+        produce(data, (draft) => {
+          for (const block of draft) {
+            if (block.page != null) {
+              // it's a block
+              const markers = {
+                replaced: new Map(),
+                added: [],
+              }
+              const propsClone = { ...props }
+              const lines = block.content.split("\n")
+              for (let i = 0; i < lines.length; i++) {
+                const line = lines[i]
+                for (const prop of Object.keys(props)) {
+                  if (line.startsWith(`${prop}::`)) {
+                    markers.replaced.set(i, `${prop}:: ${props[prop]}`)
+                    delete propsClone[prop]
+                    break
+                  }
+                }
+              }
+              markers.added = Object.entries(propsClone ?? {}).map(
+                ([name, value]) => `${name}:: ${value}`,
+              )
+              if (markers.replaced.size > 0 || markers.added.length > 0) {
+                block.writePropMarkers = markers
+              } else {
+                block.writePropMarkers = undefined
+              }
+            } else {
+              // it's a page
+              const markers = {
+                replaced: {},
+                added: { ...props },
+              }
+              const properties = Object.keys(block.properties ?? {})
+              for (const property of properties) {
+                if (props[property] != null) {
+                  markers.replaced[property] = props[property]
+                  delete markers.added[property]
+                }
+              }
+              if (
+                Object.keys(markers.replaced).length > 0 ||
+                Object.keys(markers.added).length > 0
+              ) {
+                block.writePropMarkers = markers
+              } else {
+                block.writePropMarkers = undefined
+              }
+            }
+          }
+        }),
+      )
+    }, 500),
+    [],
+  )
 
   const writeProps = useCallback(
     async (data, props) => {
@@ -38,7 +112,7 @@ export default function WritePropsPane() {
   )
 
   function onWrite() {
-    const props = text
+    const props = text.current
       .split("\n")
       .map((line) => line.trim())
       .filter((line) => line)
@@ -47,7 +121,10 @@ export default function WritePropsPane() {
     batchProcess(writeProps, props)
   }
 
-  const textareaProps = useCompositionChange((e) => setText(e.target.value))
+  const textareaProps = useCompositionChange((e) => {
+    setText(e.target.value)
+    preview()
+  })
 
   return (
     <div class={styles.container}>
@@ -55,7 +132,7 @@ export default function WritePropsPane() {
         placeholder={t(
           "Each line is a property to write. E.g:\nprop-a:: value\nprop-b:: value",
         )}
-        value={text}
+        value={text.current}
         {...textareaProps}
         autoSize={{ minRows: 3 }}
       />
