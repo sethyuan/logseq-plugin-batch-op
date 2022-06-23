@@ -1,6 +1,7 @@
 import { Button, Input, Segmented } from "@/components/antd"
 import { t } from "logseq-l10n"
 import { useState } from "preact/hooks"
+import { useCompositionChange } from "reactutils"
 import styles from "./index.css"
 
 const { TextArea } = Input
@@ -24,6 +25,8 @@ export default function QueryInput({ onQuery }) {
       onQuery?.(mode, text)
     }
   }
+
+  const textareaProps = useCompositionChange((e) => setText(e.target.value))
 
   return (
     <section class={styles.container}>
@@ -56,7 +59,7 @@ export default function QueryInput({ onQuery }) {
               )
         }
         value={text}
-        onChange={(e) => setText(e.target.value)}
+        {...textareaProps}
         onKeyDown={onKeyDown}
       />
     </section>

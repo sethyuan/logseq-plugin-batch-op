@@ -131,7 +131,7 @@ export default function Shell({ locale }) {
           </p>
           <CloseIcon class={styles.close} onClick={hideUI} />
         </section>
-        <ShellContext.Povider value={contextValue}>
+        <ShellContext.Provider value={contextValue}>
           <section ref={panelsRef} class={styles.panels}>
             {inputShown && <QueryInput onQuery={performQuery} />}
             <QueryResult
@@ -147,7 +147,7 @@ export default function Shell({ locale }) {
             />
             {opShown && <BatchOps onTabChange={setCurrentTab} />}
           </section>
-        </ShellContext.Povider>
+        </ShellContext.Provider>
         <div class={cls(styles.overlay, isProcessing && styles.visible)} />
       </main>
     </ConfigProvider>

@@ -1,9 +1,10 @@
 import { Button, Input, message, Popconfirm } from "@/components/antd"
 import { ShellContext } from "@/libs/contexts"
+import produce from "immer"
 import { t } from "logseq-l10n"
 import { useCallback, useContext, useRef } from "preact/hooks"
-import { debounce, produce } from "rambdax"
-import { useStateRef } from "reactutils"
+import { debounce } from "rambdax"
+import { useCompositionChange, useStateRef } from "reactutils"
 import styles from "./index.css"
 
 export default function ReplaceContentPane() {
@@ -54,11 +55,11 @@ export default function ReplaceContentPane() {
         lastPattern.current = pattern
       }
       if (replacement !== lastReplacement.current) {
-        setQueryResults((data) =>
-          produce(data, (draft) => {
-            draft.searchReplacement = replacement
-          }),
-        )
+        setQueryResults((data) => {
+          const value = data.slice()
+          value.searchReplacement = replacement
+          return value
+        })
         lastReplacement.current = replacement
       }
     }, 500),
@@ -92,24 +93,22 @@ export default function ReplaceContentPane() {
     setReplacementText("")
   }
 
+  const patternChangeProps = useCompositionChange((e) => {
+    setPatternText(e.target.value)
+    previewReplace()
+  })
+
+  const replacementChangeProps = useCompositionChange((e) => {
+    setReplacementText(e.target.value)
+    previewReplace()
+  })
+
   return (
     <div class={styles.container}>
       <div>{t("Search: ")}</div>
-      <Input
-        value={patternText.current}
-        onChange={(e) => {
-          setPatternText(e.target.value)
-          previewReplace()
-        }}
-      />
+      <Input value={patternText.current} {...patternChangeProps} />
       <div>{t("Replace: ")}</div>
-      <Input
-        value={replacementText.current}
-        onChange={(e) => {
-          setReplacementText(e.target.value)
-          previewReplace()
-        }}
-      />
+      <Input value={replacementText.current} {...replacementChangeProps} />
       <div ref={buttonContainerRef}>
         <Popconfirm
           getPopupContainer={() => buttonContainerRef.current}

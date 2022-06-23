@@ -1,7 +1,8 @@
 import { Button, Input, Popconfirm } from "@/components/antd"
 import { ShellContext } from "@/libs/contexts"
 import { t } from "logseq-l10n"
-import { useContext, useRef, useState } from "preact/hooks"
+import { useCallback, useContext, useRef, useState } from "preact/hooks"
+import { useCompositionChange } from "reactutils"
 import styles from "./index.css"
 
 const { TextArea } = Input
@@ -46,6 +47,8 @@ export default function WritePropsPane() {
     batchProcess(writeProps, props)
   }
 
+  const textareaProps = useCompositionChange((e) => setText(e.target.value))
+
   return (
     <div class={styles.container}>
       <TextArea
@@ -53,7 +56,7 @@ export default function WritePropsPane() {
           "Each line is a property to write. E.g:\nprop-a:: value\nprop-b:: value",
         )}
         value={text}
-        onChange={(e) => setText(e.target.value)}
+        {...textareaProps}
         autoSize={{ minRows: 3 }}
       />
       <div ref={buttonContainerRef}>

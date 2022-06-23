@@ -1,7 +1,8 @@
 import { Button, Input, Popconfirm } from "@/components/antd"
 import { ShellContext } from "@/libs/contexts"
 import { t } from "logseq-l10n"
-import { useContext, useRef, useState } from "preact/hooks"
+import { useCallback, useContext, useRef, useState } from "preact/hooks"
+import { useCompositionChange } from "reactutils"
 import styles from "./index.css"
 
 const { TextArea } = Input
@@ -57,6 +58,8 @@ export default function RenamePropsPane() {
     setText("")
   }
 
+  const textareaProps = useCompositionChange((e) => setText(e.target.value))
+
   return (
     <div class={styles.container}>
       <TextArea
@@ -64,7 +67,7 @@ export default function RenamePropsPane() {
           "Each line is a property to rename. E.g:\nprop-a -> prop-b",
         )}
         value={text}
-        onChange={(e) => setText(e.target.value)}
+        {...textareaProps}
         autoSize={{ minRows: 3 }}
       />
       <div ref={buttonContainerRef}>

@@ -7,7 +7,7 @@ export default function DeletePane() {
   const containerRef = useRef()
   const { batchProcess, resetQuery } = useContext(ShellContext)
 
-  const delete = useCallback(
+  const deleteThem = useCallback(
     async (data) => {
       await Promise.all(
         data.map((block) =>
@@ -32,7 +32,7 @@ export default function DeletePane() {
         okText={t("Yes")}
         cancelText={t("I'll reconsider")}
         okButtonProps={{ danger: true }}
-        onConfirm={() => batchProcess(delete)}
+        onConfirm={() => batchProcess(deleteThem)}
       >
         <Button type="primary" danger block>
           {t("Delete Block/Page")}

@@ -1,7 +1,8 @@
 import { Button, Input, Popconfirm } from "@/components/antd"
 import { ShellContext } from "@/libs/contexts"
 import { t } from "logseq-l10n"
-import { useContext, useRef, useState } from "preact/hooks"
+import { useCallback, useContext, useRef, useState } from "preact/hooks"
+import { useCompositionChange } from "reactutils"
 import styles from "./index.css"
 
 const { TextArea } = Input
@@ -45,6 +46,8 @@ export default function DeletePropsPane() {
     setText("")
   }
 
+  const textareaProps = useCompositionChange((e) => setText(e.target.value))
+
   return (
     <div class={styles.container}>
       <TextArea
@@ -52,7 +55,7 @@ export default function DeletePropsPane() {
           "Each line is a property to delete. E.g:\nprop-a\nprop-b",
         )}
         value={text}
-        onChange={(e) => setText(e.target.value)}
+        {...textareaProps}
         autoSize={{ minRows: 3 }}
       />
       <div ref={buttonContainerRef}>
