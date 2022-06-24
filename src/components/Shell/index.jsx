@@ -6,7 +6,7 @@ import CloseIcon from "@/icons/close.svg"
 import { ShellContext } from "@/libs/contexts"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { t } from "logseq-l10n"
-import { useCallback, useMemo, useState } from "preact/hooks"
+import { useCallback, useMemo, useRef, useState } from "preact/hooks"
 import { cls } from "reactutils"
 import styles from "./index.css"
 
@@ -20,6 +20,7 @@ export default function Shell({ locale }) {
   const [isLoading, setIsLoading] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [currentTab, setCurrentTab] = useState("delete")
+  const lastEsc = useRef()
 
   function hideUI() {
     resetQuery()
@@ -35,7 +36,11 @@ export default function Shell({ locale }) {
           : await logseq.DB.datascriptQuery(q)
       // Accept only blocks and pages.
       const results = Array.isArray(res)
-        ? res.filter((x) => typeof x === "object" && x.uuid)
+        ? mode === SIMPLE
+          ? res.filter((x) => typeof x === "object" && x.uuid)
+          : res
+              .map((item) => item[0])
+              .filter((x) => typeof x === "object" && x.uuid)
         : []
       setQueryResults(results)
       setResultsSelection(results.map(() => true))
@@ -118,14 +123,22 @@ export default function Shell({ locale }) {
     [batchProcess, getNewestQueryResults, setQueryResults, resetQuery],
   )
 
-  const stopPropagation = useCallback((e) => {
-    e.stopPropagation()
+  const ESC_INTERVAL = 300
+
+  const onKeyUp = useCallback((e) => {
+    if (e.key === "Escape") {
+      if (e.timeStamp - lastEsc.current < ESC_INTERVAL) {
+        hideUI()
+      } else {
+        lastEsc.current = e.timeStamp
+      }
+    }
   }, [])
 
   return (
     <ConfigProvider autoInsertSpaceInButton={false}>
-      <div class={styles.rootOverlay} onClick={hideUI}>
-        <main class={styles.container} onClick={stopPropagation}>
+      <div class={styles.rootOverlay}>
+        <main class={styles.container} tabIndex={-1} onKeyUp={onKeyUp}>
           <section class={styles.titleBar}>
             <h1 class={styles.title}>{t("Batch processing")}</h1>
             <p class={styles.subtitle}>
