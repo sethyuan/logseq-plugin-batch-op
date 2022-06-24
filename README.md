@@ -8,13 +8,27 @@ Perform queries on the current graph and batch process on the results.
 
 ### 批量删除 (Batch Delete)
 
+![delete](delete.gif)
+
 ### 批量删除属性 (Batch Delete Properties)
+
+![delete_props](delete_props.gif)
 
 ### 批量重命名属性 (Batch Rename Properties)
 
+![rename_props](rename_props.gif)
+
 ### 批量替换或写入属性 (Batch Replace/Write Properties)
 
+![write_props](write_props.gif)
+
 ### 批量替换内容 (Batch Replace Content)
+
+![replace](replace.gif)
+
+### 仅对部分结果做批处理 (Perform batch processing only on selected results)
+
+![selection](selection.gif)
 
 ## 翻译 (Translations)
 
