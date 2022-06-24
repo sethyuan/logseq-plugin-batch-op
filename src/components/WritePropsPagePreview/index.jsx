@@ -1,3 +1,4 @@
+import { camelToDash } from "@/libs/utils"
 import styles from "./index.css"
 
 export default function WritePropsPagePreview({ data }) {
@@ -5,7 +6,8 @@ export default function WritePropsPagePreview({ data }) {
   const markers = data.writePropMarkers
   const nodes = []
 
-  for (const [name, value] of properties) {
+  for (const [k, value] of properties) {
+    const name = camelToDash(k)
     if (markers.replaced[name] != null) {
       nodes.push(
         <div class={styles.matched}>

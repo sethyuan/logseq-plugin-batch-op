@@ -1,5 +1,6 @@
 import { Button, Input, Popconfirm } from "@/components/antd"
 import { ShellContext } from "@/libs/contexts"
+import { camelToDash } from "@/libs/utils"
 import produce from "immer"
 import { t } from "logseq-l10n"
 import { useCallback, useContext, useRef } from "preact/hooks"
@@ -44,7 +45,8 @@ export default function DeletePropsPane() {
               // it's a page
               const properties = Object.entries(block.properties ?? {})
               for (let i = 0; i < properties.length; i++) {
-                const [property] = properties[i]
+                const [k] = properties[i]
+                const property = camelToDash(k)
                 if (props.has(property)) {
                   markers.add(i)
                 }

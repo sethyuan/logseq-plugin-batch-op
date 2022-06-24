@@ -118,35 +118,41 @@ export default function Shell({ locale }) {
     [batchProcess, getNewestQueryResults, setQueryResults, resetQuery],
   )
 
+  const stopPropagation = useCallback((e) => {
+    e.stopPropagation()
+  }, [])
+
   return (
     <ConfigProvider autoInsertSpaceInButton={false}>
-      <main class={styles.container}>
-        <section class={styles.titleBar}>
-          <h1 class={styles.title}>{t("Batch processing")}</h1>
-          <p class={styles.subtitle}>
-            {t("A backup is recommended before performing batch processing")}
-          </p>
-          <CloseIcon class={styles.close} onClick={hideUI} />
-        </section>
-        <ShellContext.Provider value={contextValue}>
-          <section ref={panels} class={styles.panels}>
-            {inputShown && <QueryInput onQuery={performQuery} />}
-            <QueryResult
-              loading={isLoading}
-              data={queryResults}
-              selection={resultsSelection}
-              mode={queryResultMode}
-              onProcess={switchToProcessing}
-              onReset={resetQuery}
-              onSelect={changeSelection}
-              onSelectAll={changeSelectionForAll}
-              tab={currentTab}
-            />
-            {opShown && <BatchOps onTabChange={setCurrentTab} />}
+      <div class={styles.rootOverlay} onClick={hideUI}>
+        <main class={styles.container} onClick={stopPropagation}>
+          <section class={styles.titleBar}>
+            <h1 class={styles.title}>{t("Batch processing")}</h1>
+            <p class={styles.subtitle}>
+              {t("A backup is recommended before performing batch processing")}
+            </p>
+            <CloseIcon class={styles.close} onClick={hideUI} />
           </section>
-        </ShellContext.Provider>
-        <div class={cls(styles.overlay, isProcessing && styles.visible)} />
-      </main>
+          <ShellContext.Provider value={contextValue}>
+            <section ref={panels} class={styles.panels}>
+              {inputShown && <QueryInput onQuery={performQuery} />}
+              <QueryResult
+                loading={isLoading}
+                data={queryResults}
+                selection={resultsSelection}
+                mode={queryResultMode}
+                onProcess={switchToProcessing}
+                onReset={resetQuery}
+                onSelect={changeSelection}
+                onSelectAll={changeSelectionForAll}
+                tab={currentTab}
+              />
+              {opShown && <BatchOps onTabChange={setCurrentTab} />}
+            </section>
+          </ShellContext.Provider>
+          <div class={cls(styles.overlay, isProcessing && styles.visible)} />
+        </main>
+      </div>
     </ConfigProvider>
   )
 }

@@ -1,3 +1,4 @@
+import { camelToDash } from "@/libs/utils"
 import styles from "./index.css"
 
 export default function DeletePropsPagePreview({ data }) {
@@ -6,7 +7,8 @@ export default function DeletePropsPagePreview({ data }) {
   const nodes = []
 
   for (let i = 0; i < properties.length; i++) {
-    const [name, value] = properties[i]
+    const [k, value] = properties[i]
+    const name = camelToDash(k)
     if (markers.has(i)) {
       nodes.push(
         <div class={styles.todelete}>

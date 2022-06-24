@@ -7,6 +7,7 @@ import ReplaceBlockPreview from "@/components/ReplaceBlockPreview"
 import WritePropsBlockPreview from "@/components/WritePropsBlockPreview"
 import WritePropsPagePreview from "@/components/WritePropsPagePreview"
 import HierarchyIcon from "@/icons/hierarchy.svg"
+import { camelToDash } from "@/libs/utils"
 import { t } from "logseq-l10n"
 import { cls } from "reactutils"
 import styles from "./index.css"
@@ -160,7 +161,7 @@ function PageResult({ data, checked, index, onSelect, showSelection, tab }) {
   } else {
     view = properties.map(([name, val], i) => (
       <div key={i}>
-        <span class={styles.resultPropName}>{name}</span>: {val}
+        <span class={styles.resultPropName}>{camelToDash(name)}</span>: {val}
       </div>
     ))
   }

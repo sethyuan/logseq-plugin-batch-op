@@ -1,5 +1,6 @@
 import { Button, Input, Popconfirm } from "@/components/antd"
 import { ShellContext } from "@/libs/contexts"
+import { camelToDash } from "@/libs/utils"
 import produce from "immer"
 import { t } from "logseq-l10n"
 import { useCallback, useContext, useRef } from "preact/hooks"
@@ -63,7 +64,9 @@ export default function WritePropsPane() {
                 replaced: {},
                 added: { ...props },
               }
-              const properties = Object.keys(block.properties ?? {})
+              const properties = Object.keys(block.properties ?? {}).map(
+                (name) => camelToDash(name),
+              )
               for (const property of properties) {
                 if (props[property] != null) {
                   markers.replaced[property] = props[property]

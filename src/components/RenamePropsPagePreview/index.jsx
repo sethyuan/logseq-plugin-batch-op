@@ -1,3 +1,4 @@
+import { camelToDash } from "@/libs/utils"
 import styles from "./index.css"
 
 export default function RenamePropsPagePreview({ data }) {
@@ -5,7 +6,8 @@ export default function RenamePropsPagePreview({ data }) {
   const markers = data.renamePropMarkers
   const nodes = []
 
-  for (const [name, value] of properties) {
+  for (const [k, value] of properties) {
+    const name = camelToDash(k)
     if (markers[name] != null) {
       nodes.push(
         <div>

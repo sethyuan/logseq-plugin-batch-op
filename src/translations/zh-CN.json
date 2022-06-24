@@ -1,7 +1,7 @@
 {
   "Batch processing": "批量处理",
   "A backup is recommended before performing batch processing": "推荐在批处理前做下备份",
-  "Open batch processing": "打开批量处理",
+  "Open batch processing": "打开批量处理 (Open batch processing)",
   "Controls whether to show the toolbar button.": "控制是否显示工具栏按钮。",
   "Defines a shortcut for opening batch processing.": "为打开批量处理设置一个快捷键。",
   "Delete": "删除",
@@ -17,7 +17,8 @@
   "Yes": "是的",
   "I'll reconsider": "我再想想",
   "Each line is a property to delete. E.g:\nprop-a\nprop-b": "每行是一个待删除的属性。例如：\nprop-a\nprop-b",
-  "Each line is a property to rename. E.g:\nprop-a -> prop-b": "每行是一个待重命名的属性。例如将prop-a重命名为prop-b：\nprop-a -> prop-b",
+  "Each line is a property to rename. E.g:\nprop-a -> prop-b": "每行是一个待重命名的属性。例如：\nprop-a -> prop-b",
+  "Each line is a property to write. E.g:\nprop-a:: value\nprop-b:: value": "每行是一个待赋值的属性。例如：\nprop-a:: value\nprop-b:: value",
   "Are you sure you want to delete these properties from the selected blocks/pages?": "你确定要从选种的块/页中删除这些属性吗？",
   "Are you sure you want to rename these properties on the selected blocks/pages?": "你确定要在选种的块/页中重命名这些属性吗？",
   "Are you sure you want to write these properties on the selected blocks/pages?": "你确定要在选种的块/页中写入这些属性吗？",
@@ -36,5 +37,6 @@
   "Search: ": "搜索：",
   "Replace: ": "替换：",
   "What do you want to search?": "你要查找什么？",
-  "NOTE: Can only work agains normal blocks, not pages.": "注意：只能用于普通块，页面不适用。"
+  "NOTE: Can only work agains normal blocks, not pages.": "注意：只能用于普通块，页面不适用。",
+  "Batch processing finished.": "批处理执行完毕。"
 }
