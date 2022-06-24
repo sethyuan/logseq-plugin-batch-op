@@ -87,11 +87,11 @@ export default function ReplaceContentPane() {
     [getNewestQueryResults],
   )
 
-  function replace() {
+  const onReplace = useCallback(() => {
     batchProcess(replaceContent, patternText.current, replacementText.current)
     setPatternText("")
     setReplacementText("")
-  }
+  }, [batchProcess])
 
   const patternChangeProps = useCompositionChange((e) => {
     setPatternText(e.target.value)
@@ -117,10 +117,12 @@ export default function ReplaceContentPane() {
         <Popconfirm
           getPopupContainer={() => buttonContainerRef.current}
           placement="bottom"
-          title={t("Sure to make these replacements?")}
+          title={t(
+            "Are you sure you want to make these replacements on the selected blocks/pages?",
+          )}
           okText={t("Yes")}
           cancelText={t("I'll reconsider")}
-          onConfirm={replace}
+          onConfirm={onReplace}
         >
           <Button type="primary" block>
             {t("Replace")}

@@ -10,14 +10,11 @@ import Empty from "antd/es/empty"
 import "antd/es/empty/style/index.css"
 import Input from "antd/es/input"
 import "antd/es/input/style/index.css"
-import zhCN from "antd/es/locale/zh_CN"
 import message from "antd/es/message"
 import "antd/es/message/style/index.css"
 import Popconfirm from "antd/es/popconfirm"
 import "antd/es/popconfirm/style/index.css"
 import "antd/es/popover/style/index.css"
-import Progress from "antd/es/progress"
-import "antd/es/progress/style/index.css"
 import Segmented from "antd/es/segmented"
 import "antd/es/segmented/style/index.css"
 import Skeleton from "antd/es/skeleton"
@@ -33,11 +30,9 @@ export {
   Checkbox,
   Input,
   Popconfirm,
-  Progress,
   Segmented,
   Skeleton,
   Empty,
   Tabs,
   message,
-  zhCN,
 }

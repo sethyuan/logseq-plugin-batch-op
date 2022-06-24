@@ -1,4 +1,4 @@
-import { ConfigProvider, message, zhCN } from "@/components/antd"
+import { ConfigProvider, message } from "@/components/antd"
 import BatchOps from "@/components/BatchOps"
 import QueryInput, { SIMPLE } from "@/components/QueryInput"
 import QueryResult, { PROCESS, RESET } from "@/components/QueryResult"
@@ -16,7 +16,7 @@ export default function Shell({ locale }) {
   const [queryResultMode, setQueryResultMode] = useState(PROCESS)
   const [queryResults, setQueryResults] = useState(null)
   const [resultsSelection, setResultsSelection] = useState(null)
-  const [panelsRef] = useAutoAnimate()
+  const [panels] = useAutoAnimate()
   const [isLoading, setIsLoading] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [currentTab, setCurrentTab] = useState("delete")
@@ -119,10 +119,7 @@ export default function Shell({ locale }) {
   )
 
   return (
-    <ConfigProvider
-      autoInsertSpaceInButton={false}
-      locale={locale === "zh-CN" ? zhCN : undefined}
-    >
+    <ConfigProvider autoInsertSpaceInButton={false}>
       <main class={styles.container}>
         <section class={styles.titleBar}>
           <h1 class={styles.title}>{t("Batch processing")}</h1>
@@ -132,7 +129,7 @@ export default function Shell({ locale }) {
           <CloseIcon class={styles.close} onClick={hideUI} />
         </section>
         <ShellContext.Provider value={contextValue}>
-          <section ref={panelsRef} class={styles.panels}>
+          <section ref={panels} class={styles.panels}>
             {inputShown && <QueryInput onQuery={performQuery} />}
             <QueryResult
               loading={isLoading}

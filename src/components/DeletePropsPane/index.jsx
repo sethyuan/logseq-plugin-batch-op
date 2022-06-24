@@ -87,14 +87,14 @@ export default function DeletePropsPane() {
     [getNewestQueryResults],
   )
 
-  function onDelete() {
+  const onDelete = useCallback(() => {
     const props = text.current
       .split("\n")
       .map((line) => line.trim())
       .filter((line) => line)
     batchProcess(deleteProps, props)
     setText("")
-  }
+  }, [batchProcess])
 
   const textareaProps = useCompositionChange((e) => {
     setText(e.target.value)
@@ -115,7 +115,9 @@ export default function DeletePropsPane() {
         <Popconfirm
           getPopupContainer={() => buttonContainerRef.current}
           placement="bottom"
-          title={t("Sure to delete these properties?")}
+          title={t(
+            "Are you sure you want to delete these properties from the selected blocks/pages?",
+          )}
           okText={t("Yes")}
           cancelText={t("I'll reconsider")}
           onConfirm={onDelete}

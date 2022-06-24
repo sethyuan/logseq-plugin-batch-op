@@ -111,7 +111,7 @@ export default function WritePropsPane() {
     [getNewestQueryResults],
   )
 
-  function onWrite() {
+  const onWrite = useCallback(() => {
     const props = text.current
       .split("\n")
       .map((line) => line.trim())
@@ -119,7 +119,8 @@ export default function WritePropsPane() {
       .map((line) => line.split("::").map((fragment) => fragment.trim()))
       .filter((fragments) => fragments.length === 2 && fragments[0])
     batchProcess(writeProps, props)
-  }
+    setText("")
+  }, [batchProcess])
 
   const textareaProps = useCompositionChange((e) => {
     setText(e.target.value)
@@ -140,7 +141,9 @@ export default function WritePropsPane() {
         <Popconfirm
           getPopupContainer={() => buttonContainerRef.current}
           placement="bottom"
-          title={t("Sure to write these properties?")}
+          title={t(
+            "Are you sure you want to write these properties on the selected blocks/pages?",
+          )}
           okText={t("Yes")}
           cancelText={t("I'll reconsider")}
           onConfirm={onWrite}

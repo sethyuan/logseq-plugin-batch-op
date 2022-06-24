@@ -10,6 +10,8 @@ export default (config, env, helpers, options) => {
   }
   if (config.devServer) {
     config.devServer.host = "localhost"
+  } else {
+    delete config.devtool
   }
   svgLoader(config, helpers)
 }

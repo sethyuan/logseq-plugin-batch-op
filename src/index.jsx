@@ -1,6 +1,6 @@
-import { zhCN } from "@/components/antd"
 import Shell from "@/components/Shell"
 import "@/style/index.css"
+import zhCN from "@/translations/zh-CN.json"
 import "@logseq/libs"
 import { setup, t } from "logseq-l10n"
 import { useEffect, useState } from "preact/hooks"

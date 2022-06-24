@@ -108,7 +108,7 @@ export default function RenamePropsPane() {
     [getNewestQueryResults],
   )
 
-  function onRename() {
+  const onRename = useCallback(() => {
     const props = text.current
       .split("\n")
       .map((line) => line.trim())
@@ -119,7 +119,7 @@ export default function RenamePropsPane() {
       )
     batchProcess(renameProps, props)
     setText("")
-  }
+  }, [batchProcess])
 
   const textareaProps = useCompositionChange((e) => {
     setText(e.target.value)
@@ -140,7 +140,9 @@ export default function RenamePropsPane() {
         <Popconfirm
           getPopupContainer={() => buttonContainerRef.current}
           placement="bottom"
-          title={t("Sure to rename these properties?")}
+          title={t(
+            "Are you sure you want to rename these properties on the selected blocks/pages?",
+          )}
           okText={t("Yes")}
           cancelText={t("I'll reconsider")}
           onConfirm={onRename}

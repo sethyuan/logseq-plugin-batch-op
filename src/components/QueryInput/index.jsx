@@ -22,7 +22,7 @@ export default function QueryInput({ onQuery }) {
     // cmd+enter or ctrl+enter
     if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
       e.preventDefault()
-      onQuery?.(mode, text)
+      onQuery(mode, text)
     }
   }
 
@@ -53,9 +53,9 @@ export default function QueryInput({ onQuery }) {
       <TextArea
         placeholder={
           mode === SIMPLE
-            ? t("Write down your query here.\n(and [[A]] [[B]])")
+            ? t("Write down your query here. E.g:\n(and [[A]] [[B]])")
             : t(
-                "Write down your advanced query here.\n[:find (pull ?b [*])\n :where\n [?b :block/marker _]]",
+                "Write down your advanced query here. E.g:\n[:find (pull ?b [*])\n :where\n [?b :block/marker _]]",
               )
         }
         value={text}
