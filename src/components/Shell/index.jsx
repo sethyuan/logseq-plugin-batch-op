@@ -103,9 +103,9 @@ export default function Shell({ locale }) {
       try {
         const data = queryResults.filter((_, i) => resultsSelection[i])
         await fn(data, ...args)
-        logseq.App.showMsg(t("Batch processing finished."))
+        message.info(t("Batch processing finished."))
       } catch (err) {
-        logseq.App.showMsg(err.message, "error")
+        message.error(err.message)
       } finally {
         setIsProcessing(false)
       }
