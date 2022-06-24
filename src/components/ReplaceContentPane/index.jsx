@@ -107,7 +107,7 @@ export default function ReplaceContentPane() {
     <div class={styles.container}>
       <Alert
         type="info"
-        message={t("NOTE: Can only work agains normal blocks, not pages.")}
+        message={t("NOTE: Can only work against normal blocks, not pages.")}
       />
       <div>{t("Search: ")}</div>
       <Input value={patternText.current} {...patternChangeProps} />

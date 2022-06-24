@@ -34,4 +34,4 @@ Perform queries on the current graph and batch process on the results.
 
 你可以以 PR 的形式向[项目](https://github.com/sethyuan/logseq-plugin-batch-op/tree/master/src/translations)提交一个翻译文件，请参考项目中的 `zh-CN.json` 文件。
 
-You can submit a PR with the translation files to the [project](https://github.com/sethyuan/logseq-plugin-batch-op/tree/master/src/translations), please refer to the `zh-CN.json` file in the project.
+You can submit a PR with the translation files to the [project](https://github.com/sethyuan/logseq-plugin-batch-op/tree/master/src/translations), please refer to the `zh-CN.json` file in the project as an example.
