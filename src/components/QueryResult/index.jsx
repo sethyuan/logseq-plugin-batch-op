@@ -26,24 +26,20 @@ export default function QueryResult({
   onSelectAll,
   tab,
 }) {
-  function calcCheckAllStatus() {
-    if (!selection?.length) return false
-    let status = selection[0]
-    for (let i = 1; i < selection.length; i++) {
-      if (selection[i] !== status) return null
-    }
-    return status
+  function getCheckedNum() {
+    if (!selection?.length) return 0
+    return selection.reduce((total, checked) => total + checked, 0)
   }
 
-  const allChecked = calcCheckAllStatus()
+  const checkedNum = getCheckedNum()
 
   return (
     <section class={styles.container}>
       <div class={styles.bar}>
         {mode === RESET && data?.length > 0 ? (
           <Checkbox
-            checked={allChecked}
-            indeterminate={allChecked === null}
+            checked={checkedNum === data.length}
+            indeterminate={checkedNum < data.length && checkedNum > 0}
             onChange={onSelectAll}
           >
             {t("All")}
@@ -52,12 +48,22 @@ export default function QueryResult({
           <div />
         )}
         {data?.length > 0 && (
-          <Button
-            type="primary"
-            onClick={mode === PROCESS ? onProcess : onReset}
-          >
-            {mode === PROCESS ? t("Process") : t("Reset")}
-          </Button>
+          <div>
+            <span class={styles.count}>
+              <span
+                class={cls(styles.selCount, mode === RESET && styles.showSel)}
+              >
+                {checkedNum} /{" "}
+              </span>
+              {data.length}
+            </span>
+            <Button
+              type="primary"
+              onClick={mode === PROCESS ? onProcess : onReset}
+            >
+              {mode === PROCESS ? t("Process") : t("Reset")}
+            </Button>
+          </div>
         )}
       </div>
 

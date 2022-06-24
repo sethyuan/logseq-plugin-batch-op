@@ -87,3 +87,16 @@
   top: 4px;
   right: 10px;
 }
+
+.count {
+  margin-right: 15px;
+  color: var(--result-count-fg);
+}
+
+.selCount {
+  display: none;
+}
+
+.showSel {
+  display: inline;
+}

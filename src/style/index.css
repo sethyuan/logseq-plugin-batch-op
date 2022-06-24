@@ -1,4 +1,5 @@
 :root {
+  --result-count-fg: #666;
   --matched-bg: #ffaeae;
   --substitution-bg: #acf7ac;
   --delete-fg: #999;
