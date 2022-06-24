@@ -1,6 +1,6 @@
 import { Button, Input, Popconfirm } from "@/components/antd"
 import { ShellContext } from "@/libs/contexts"
-import { camelToDash } from "@/libs/utils"
+import { camelToDash, dashToCamel } from "@/libs/utils"
 import produce from "immer"
 import { t } from "logseq-l10n"
 import { useCallback, useContext, useRef } from "preact/hooks"
@@ -86,7 +86,7 @@ export default function RenamePropsPane() {
               await logseq.Editor.upsertBlockProperty(
                 block.uuid,
                 v,
-                block.properties[k],
+                block.properties[dashToCamel(k)],
               )
             }),
           )
@@ -96,10 +96,16 @@ export default function RenamePropsPane() {
             await Promise.all(
               props.map(async ([k, v]) => {
                 await logseq.Editor.removeBlockProperty(block.uuid, k)
+                // HACK: "_" and "-" are treated as same in Logseq, so
+                // an extra remove is necessary.
+                await logseq.Editor.removeBlockProperty(
+                  block.uuid,
+                  k.replace("-", "_"),
+                )
                 await logseq.Editor.upsertBlockProperty(
                   block.uuid,
                   v,
-                  block.properties[k],
+                  block.properties[dashToCamel(k)],
                 )
               }),
             )
