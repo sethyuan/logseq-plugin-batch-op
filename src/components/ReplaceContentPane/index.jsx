@@ -22,8 +22,8 @@ export default function ReplaceContentPane() {
       const replacement = replacementText.current
 
       if (pattern !== lastPattern.current) {
-        setQueryResults((data) =>
-          produce(data, (draft) => {
+        setQueryResults((data) => {
+          const value = produce(data, (draft) => {
             for (const block of draft) {
               // Only do replacements for blocks, not pages.
               if (block.page == null) continue
@@ -52,8 +52,10 @@ export default function ReplaceContentPane() {
                 block.searchMarkers = undefined
               }
             }
-          }),
-        )
+          })
+          value.searchReplacement = lastReplacement.current
+          return value
+        })
         lastPattern.current = pattern
       }
       if (replacement !== lastReplacement.current) {
