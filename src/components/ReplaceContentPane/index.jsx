@@ -48,6 +48,8 @@ export default function ReplaceContentPane() {
               }
               if (searchMarkers.length > 0) {
                 block.searchMarkers = searchMarkers
+              } else {
+                block.searchMarkers = undefined
               }
             }
           }),
