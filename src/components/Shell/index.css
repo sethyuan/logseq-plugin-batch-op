@@ -8,7 +8,8 @@
 }
 
 .container {
-  width: 900px;
+  min-width: 900px;
+  width: 80%;
   height: 80%;
   min-height: 500px;
   background-color: white;
