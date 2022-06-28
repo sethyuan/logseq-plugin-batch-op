@@ -167,7 +167,8 @@ function PageResult({ data, checked, index, onSelect, showSelection, tab }) {
   } else {
     view = properties.map(([name, val], i) => (
       <div key={i}>
-        <span class={styles.resultPropName}>{camelToDash(name)}</span>: {val}
+        <span class={styles.resultPropName}>{camelToDash(name)}</span>:{" "}
+        {Array.isArray(val) ? val.join(", ") : val}
       </div>
     ))
   }
