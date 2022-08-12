@@ -1,4 +1,11 @@
-import { Alert, Button, Input, message, Popconfirm } from "@/components/antd"
+import {
+  Alert,
+  Button,
+  Checkbox,
+  Input,
+  message,
+  Popconfirm,
+} from "@/components/antd"
 import { ShellContext } from "@/libs/contexts"
 import produce from "immer"
 import { t } from "logseq-l10n"
@@ -15,13 +22,15 @@ export default function ReplaceContentPane() {
   const buttonContainerRef = useRef()
   const { batchProcess, getNewestQueryResults, setQueryResults } =
     useContext(ShellContext)
+  const [isRegex, setIsRegex] = useStateRef(false)
+  const [sensitive, setSensitive] = useStateRef(false)
 
   const preview = useCallback(
-    debounce(() => {
+    debounce((forceRun = false) => {
       const pattern = patternText.current
       const replacement = replacementText.current
 
-      if (pattern !== lastPattern.current) {
+      if (pattern !== lastPattern.current || forceRun) {
         setQueryResults((data) => {
           const value = produce(data, (draft) => {
             for (const block of draft) {
@@ -35,17 +44,14 @@ export default function ReplaceContentPane() {
                 continue
               }
 
-              const patternLength = pattern.length
-              const searchMarkers = []
-              for (
-                let i = 0, matchStart = 0;
-                i < block.content.length;
-                i = matchStart + patternLength
-              ) {
-                matchStart = block.content.indexOf(pattern, i)
-                if (matchStart < 0) break
-                searchMarkers.push([matchStart, matchStart + patternLength])
-              }
+              const searchMarkers = isRegex.current
+                ? regexMatch(
+                    pattern,
+                    block.content,
+                    replacement,
+                    sensitive.current,
+                  )
+                : textMatch(pattern, block.content, replacement)
               if (searchMarkers.length > 0) {
                 block.searchMarkers = searchMarkers
               } else {
@@ -53,15 +59,35 @@ export default function ReplaceContentPane() {
               }
             }
           })
-          value.searchReplacement = lastReplacement.current
           return value
         })
         lastPattern.current = pattern
+        lastReplacement.current = replacement
+        return
       }
-      if (replacement !== lastReplacement.current) {
+
+      if (replacement !== lastReplacement.current || forceRun) {
         setQueryResults((data) => {
-          const value = data.slice()
-          value.searchReplacement = replacement
+          const value = produce(data, (draft) => {
+            try {
+              const regex = toRegex(pattern, sensitive.current)
+              for (const block of draft) {
+                if (block.searchMarkers == null) continue
+                for (const marker of block.searchMarkers) {
+                  if (isRegex.current) {
+                    const [start, end] = marker
+                    marker[2] = block.content
+                      .substring(start, end)
+                      .replace(regex, replacement)
+                  } else {
+                    marker[2] = replacement
+                  }
+                }
+              }
+            } catch {
+              // Ignore regex errors
+            }
+          })
           return value
         })
         lastReplacement.current = replacement
@@ -82,8 +108,15 @@ export default function ReplaceContentPane() {
 
       await Promise.all(
         data.map((block) => {
-          const replaced = block.content.replaceAll(pattern, replacement ?? "")
-          return logseq.Editor.updateBlock(block.uuid, replaced)
+          try {
+            const replaced = block.content.replaceAll(
+              isRegex.current ? toRegex(pattern, sensitive.current) : pattern,
+              replacement ?? "",
+            )
+            return logseq.Editor.updateBlock(block.uuid, replaced)
+          } catch {
+            // Ignore replacement errors.
+          }
         }),
       )
       await getNewestQueryResults()
@@ -107,13 +140,31 @@ export default function ReplaceContentPane() {
     preview()
   })
 
+  function handleSetRegex(e) {
+    setIsRegex(e.target.checked)
+    preview(true)
+  }
+
+  function handleSensitive(e) {
+    setSensitive(e.target.checked)
+    preview(true)
+  }
+
   return (
     <div class={styles.container}>
       <Alert
         type="info"
         message={t("NOTE: Can only work against blocks, not pages.")}
       />
-      <div>{t("Search: ")}</div>
+      <div>
+        <span>{t("Search: ")}</span>
+        <Checkbox checked={sensitive.current} onChange={handleSensitive}>
+          <span title={t("Case sensitive")}>{t("Case")}</span>
+        </Checkbox>
+        <Checkbox checked={isRegex.current} onChange={handleSetRegex}>
+          {t("Regex")}
+        </Checkbox>
+      </div>
       <Input value={patternText.current} {...patternChangeProps} />
       <div>{t("Replace: ")}</div>
       <Input value={replacementText.current} {...replacementChangeProps} />
@@ -135,4 +186,40 @@ export default function ReplaceContentPane() {
       </div>
     </div>
   )
+}
+
+function textMatch(pattern, text, replacement) {
+  const searchMarkers = []
+  const patternLength = pattern.length
+  for (
+    let i = 0, matchStart = 0;
+    i < text.length;
+    i = matchStart + patternLength
+  ) {
+    matchStart = text.indexOf(pattern, i)
+    if (matchStart < 0) break
+    searchMarkers.push([matchStart, matchStart + patternLength, replacement])
+  }
+  return searchMarkers
+}
+
+function regexMatch(pattern, text, replacement, sensitive) {
+  const searchMarkers = []
+  try {
+    const regex = toRegex(pattern, sensitive)
+    for (const m of text.matchAll(regex)) {
+      searchMarkers.push([
+        m.index,
+        m.index + m[0].length,
+        m[0].replace(regex, replacement),
+      ])
+    }
+  } catch {
+    // Ignore regex errors and return no markers.
+  }
+  return searchMarkers
+}
+
+function toRegex(pattern, sensitive) {
+  return new RegExp(pattern, `g${sensitive ? "" : "i"}`)
 }

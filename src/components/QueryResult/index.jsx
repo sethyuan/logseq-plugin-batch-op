@@ -77,7 +77,6 @@ export default function QueryResult({
                 <BlockResult
                   key={i}
                   data={block}
-                  rootData={data}
                   checked={selection[i]}
                   index={i}
                   onSelect={onSelect}
@@ -107,15 +106,7 @@ export default function QueryResult({
   )
 }
 
-function BlockResult({
-  data,
-  rootData,
-  checked,
-  index,
-  onSelect,
-  showSelection,
-  tab,
-}) {
+function BlockResult({ data, checked, index, onSelect, showSelection, tab }) {
   const content = data.content
 
   let view
@@ -126,7 +117,7 @@ function BlockResult({
   } else if (tab === "write-prop" && data.writePropMarkers != null) {
     view = <WritePropsBlockPreview data={data} />
   } else if (tab === "replace-content" && data.searchMarkers != null) {
-    view = <ReplaceBlockPreview data={data} rootData={rootData} />
+    view = <ReplaceBlockPreview data={data} />
   } else {
     view = content.split("\n").map((line, i) => (
       <p key={i} class={styles.resultContentP}>

@@ -9,3 +9,7 @@
 .container :global(.ant-alert) {
   margin-bottom: 20px;
 }
+
+.container :global(.ant-checkbox-wrapper) {
+  float: right;
+}

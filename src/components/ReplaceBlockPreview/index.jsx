@@ -1,14 +1,13 @@
 import styles from "./index.css"
 
-export default function ReplaceBlockPreview({ data, rootData }) {
+export default function ReplaceBlockPreview({ data }) {
   const content = data.content
   const markers = data.searchMarkers
-  const replacement = rootData.searchReplacement ?? ""
 
   let index = 0
   const nodes = []
 
-  for (const [start, end] of markers) {
+  for (const [start, end, replacement] of markers) {
     const raw = content.substring(index, start)
     addLineNodes(nodes, raw)
 

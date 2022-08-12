@@ -1,6 +1,6 @@
 {
   "name": "logseq-plugin-batch-op",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "main": "dist/index.html",
   "logseq": {
     "id": "_sethyuan-logseq-batch-op",
