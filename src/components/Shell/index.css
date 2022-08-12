@@ -49,6 +49,12 @@
   color: #999;
 }
 
+.shortcutHint {
+  margin-left: 20px;
+  font-size: 0.8em;
+  color: #333;
+}
+
 .overlay {
   position: absolute;
   top: 50px;

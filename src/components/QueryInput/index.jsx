@@ -1,6 +1,6 @@
 import { Button, Input, Segmented } from "@/components/antd"
 import { t } from "logseq-l10n"
-import { useState } from "preact/hooks"
+import { useEffect, useRef, useState } from "preact/hooks"
 import { useCompositionChange } from "reactutils"
 import styles from "./index.css"
 
@@ -12,6 +12,18 @@ export const ADVANCED = 2
 export default function QueryInput({ onQuery }) {
   const [mode, setMode] = useState(SIMPLE)
   const [text, setText] = useState("")
+  const textarea = useRef()
+
+  useEffect(() => {
+    logseq.on("ui:visible:changed", ({ visible }) => {
+      if (visible) {
+        setTimeout(() => textarea.current?.focus({ cursor: "start" }), 0)
+      }
+    })
+    return () => {
+      logseq.off("ui:visible:changed")
+    }
+  }, [])
 
   function onSwitchMode(value) {
     setMode(value)
@@ -51,6 +63,7 @@ export default function QueryInput({ onQuery }) {
         </div>
       </div>
       <TextArea
+        ref={textarea}
         placeholder={
           mode === SIMPLE
             ? t("Write down your query here. E.g:\n(and [[A]] [[B]])")

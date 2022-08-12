@@ -10,6 +10,8 @@ import { useCallback, useMemo, useRef, useState } from "preact/hooks"
 import { cls } from "reactutils"
 import styles from "./index.css"
 
+const ESC_DURATION = 300
+
 export default function Shell({ locale }) {
   const [inputShown, setInputShown] = useState(true)
   const [opShown, setOpShown] = useState(false)
@@ -20,11 +22,12 @@ export default function Shell({ locale }) {
   const [isLoading, setIsLoading] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [currentTab, setCurrentTab] = useState("delete")
-  const lastEsc = useRef()
+  const escTimer = useRef()
 
   function hideUI() {
     resetQuery()
     logseq.hideMainUI()
+    escTimer.current = null
   }
 
   const performQuery = useCallback(async (mode, q) => {
@@ -123,26 +126,31 @@ export default function Shell({ locale }) {
     [batchProcess, getNewestQueryResults, setQueryResults, resetQuery],
   )
 
-  const ESC_INTERVAL = 300
+  const handleHideUI = useCallback((e) => {
+    if (e.key !== "Escape" || escTimer.current != null) return
+    escTimer.current = setTimeout(hideUI, ESC_DURATION)
+  }, [])
 
-  const onKeyUp = useCallback((e) => {
-    if (e.key === "Escape") {
-      if (e.timeStamp - lastEsc.current < ESC_INTERVAL) {
-        hideUI()
-      } else {
-        lastEsc.current = e.timeStamp
-      }
-    }
+  const cancelHideUI = useCallback((e) => {
+    if (e.key !== "Escape") return
+    clearTimeout(escTimer.current)
+    escTimer.current = null
   }, [])
 
   return (
     <ConfigProvider autoInsertSpaceInButton={false}>
-      <div class={styles.rootOverlay}>
-        <main class={styles.container} tabIndex={-1} onKeyUp={onKeyUp}>
+      <div
+        class={styles.rootOverlay}
+        tabIndex={-1}
+        onKeyDown={handleHideUI}
+        onKeyUp={cancelHideUI}
+      >
+        <main class={styles.container}>
           <section class={styles.titleBar}>
             <h1 class={styles.title}>{t("Batch processing")}</h1>
             <p class={styles.subtitle}>
               {t("A backup is recommended before performing batch processing")}
+              <span class={styles.shortcutHint}>{t("Hold ESC to close")}</span>
             </p>
             <CloseIcon class={styles.close} onClick={hideUI} />
           </section>

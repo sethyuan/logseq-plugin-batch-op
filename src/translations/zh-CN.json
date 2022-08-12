@@ -37,6 +37,7 @@
   "Search: ": "搜索：",
   "Replace: ": "替换：",
   "What do you want to search?": "你要查找什么？",
-  "NOTE: Can only work against normal blocks, not pages.": "注意：只能用于普通块，页面不适用。",
-  "Batch processing finished.": "批处理执行完毕。"
+  "NOTE: Can only work against blocks, not pages.": "注意：只能用于普通块，页面不适用。",
+  "Batch processing finished.": "批处理执行完毕。",
+  "Hold ESC to close": "按住ESC关闭"
 }
