@@ -66,24 +66,18 @@ export default function DeletePropsPane() {
 
   const deleteProps = useCallback(
     async (data, props) => {
-      await Promise.all(
-        data.map(async (block) => {
-          await Promise.all(
-            props.map((prop) =>
-              logseq.Editor.removeBlockProperty(block.uuid, prop),
-            ),
-          )
-          if (block.page == null) {
-            block = (await logseq.Editor.getPageBlocksTree(block.name))[0]
-            if (block == null) return
-            await Promise.all(
-              props.map((prop) =>
-                logseq.Editor.removeBlockProperty(block.uuid, prop),
-              ),
-            )
+      for (let block of data) {
+        for (const prop of props) {
+          await logseq.Editor.removeBlockProperty(block.uuid, prop)
+        }
+        if (block.page == null) {
+          block = (await logseq.Editor.getPageBlocksTree(block.name))[0]
+          if (block == null) return
+          for (const prop of props) {
+            await logseq.Editor.removeBlockProperty(block.uuid, prop)
           }
-        }),
-      )
+        }
+      }
       await getNewestQueryResults()
     },
     [getNewestQueryResults],

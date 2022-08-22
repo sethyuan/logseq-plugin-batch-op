@@ -9,13 +9,13 @@ export default function DeletePane() {
 
   const deleteThem = useCallback(
     async (data) => {
-      await Promise.all(
-        data.map((block) =>
-          block.page != null
-            ? logseq.Editor.removeBlock(block.uuid)
-            : logseq.Editor.deletePage(block.name),
-        ),
-      )
+      for (const block of data) {
+        if (block.page != null) {
+          await logseq.Editor.removeBlock(block.uuid)
+        } else {
+          await logseq.Editor.deletePage(block.name)
+        }
+      }
       resetQuery()
     },
     [resetQuery],

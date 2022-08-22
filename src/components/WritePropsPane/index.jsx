@@ -91,24 +91,18 @@ export default function WritePropsPane() {
 
   const writeProps = useCallback(
     async (data, props) => {
-      await Promise.all(
-        data.map(async (block) => {
-          await Promise.all(
-            props.map(([k, v]) =>
-              logseq.Editor.upsertBlockProperty(block.uuid, k, v),
-            ),
-          )
-          if (block.page == null) {
-            block = (await logseq.Editor.getPageBlocksTree(block.name))[0]
-            if (block == null) return
-            await Promise.all(
-              props.map(([k, v]) =>
-                logseq.Editor.upsertBlockProperty(block.uuid, k, v),
-              ),
-            )
+      for (let block of data) {
+        for (const [k, v] of props) {
+          await logseq.Editor.upsertBlockProperty(block.uuid, k, v)
+        }
+        if (block.page == null) {
+          block = (await logseq.Editor.getPageBlocksTree(block.name))[0]
+          if (block == null) return
+          for (const [k, v] of props) {
+            await logseq.Editor.upsertBlockProperty(block.uuid, k, v)
           }
-        }),
-      )
+        }
+      }
       await getNewestQueryResults()
     },
     [getNewestQueryResults],

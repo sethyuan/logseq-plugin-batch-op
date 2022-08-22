@@ -78,40 +78,35 @@ export default function RenamePropsPane() {
 
   const renameProps = useCallback(
     async (data, props) => {
-      await Promise.all(
-        data.map(async (block) => {
-          await Promise.all(
-            props.map(async ([k, v]) => {
-              await logseq.Editor.removeBlockProperty(block.uuid, k)
-              await logseq.Editor.upsertBlockProperty(
-                block.uuid,
-                v,
-                block.properties[dashToCamel(k)],
-              )
-            }),
+      for (let block of data) {
+        if (block.properties == null) continue
+        for (const [k, v] of props) {
+          await logseq.Editor.removeBlockProperty(block.uuid, k)
+          await logseq.Editor.upsertBlockProperty(
+            block.uuid,
+            v,
+            block.properties[dashToCamel(k)],
           )
-          if (block.page == null) {
-            block = (await logseq.Editor.getPageBlocksTree(block.name))[0]
-            if (block == null) return
-            await Promise.all(
-              props.map(async ([k, v]) => {
-                await logseq.Editor.removeBlockProperty(block.uuid, k)
-                // HACK: "_" and "-" are treated as same in Logseq, so
-                // an extra remove is necessary.
-                await logseq.Editor.removeBlockProperty(
-                  block.uuid,
-                  k.replace("-", "_"),
-                )
-                await logseq.Editor.upsertBlockProperty(
-                  block.uuid,
-                  v,
-                  block.properties[dashToCamel(k)],
-                )
-              }),
+        }
+        if (block.page == null) {
+          block = (await logseq.Editor.getPageBlocksTree(block.name))[0]
+          if (block == null) return
+          for (const [k, v] of props) {
+            await logseq.Editor.removeBlockProperty(block.uuid, k)
+            // HACK: "_" and "-" are treated as same in Logseq, so
+            // an extra remove is necessary.
+            await logseq.Editor.removeBlockProperty(
+              block.uuid,
+              k.replace("-", "_"),
+            )
+            await logseq.Editor.upsertBlockProperty(
+              block.uuid,
+              v,
+              block.properties[dashToCamel(k)],
             )
           }
-        }),
-      )
+        }
+      }
       await getNewestQueryResults()
     },
     [getNewestQueryResults],

@@ -106,19 +106,18 @@ export default function ReplaceContentPane() {
       // Only do replacements for blocks, not pages.
       data = data.filter((block) => block.page != null)
 
-      await Promise.all(
-        data.map((block) => {
-          try {
-            const replaced = block.content.replaceAll(
-              isRegex.current ? toRegex(pattern, sensitive.current) : pattern,
-              replacement ?? "",
-            )
-            return logseq.Editor.updateBlock(block.uuid, replaced)
-          } catch {
-            // Ignore replacement errors.
-          }
-        }),
-      )
+      for (const block of data) {
+        try {
+          const replaced = block.content.replaceAll(
+            isRegex.current ? toRegex(pattern, sensitive.current) : pattern,
+            replacement ?? "",
+          )
+          await logseq.Editor.updateBlock(block.uuid, replaced)
+        } catch {
+          // Ignore replacement errors.
+        }
+      }
+
       await getNewestQueryResults()
     },
     [getNewestQueryResults],
