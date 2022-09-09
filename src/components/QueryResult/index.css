@@ -59,6 +59,7 @@
 .resultContent {
   margin-bottom: 4px;
   margin-right: 14px;
+  word-break: break-all;
 }
 
 .resultContentP {
