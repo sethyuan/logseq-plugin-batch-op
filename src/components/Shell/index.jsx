@@ -36,7 +36,7 @@ export default function Shell({ locale }) {
       const res =
         mode === SIMPLE
           ? await logseq.DB.q(q)
-          : await logseq.DB.datascriptQuery(q)
+          : await logseq.DB.customQuery(q)
       // Accept only blocks and pages.
       const results = Array.isArray(res)
         ? mode === SIMPLE
