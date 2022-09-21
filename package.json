@@ -1,6 +1,6 @@
 {
   "name": "logseq-plugin-batch-op",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "main": "dist/index.html",
   "logseq": {
     "id": "_sethyuan-logseq-batch-op",
@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@formkit/auto-animate": "^1.0.0-beta.1",
-    "@logseq/libs": "^0.0.89",
+    "@logseq/libs": "^0.0.9",
     "antd": "^4.21.0",
     "immer": "^9.0.15",
     "logseq-l10n": "^0.1.0",

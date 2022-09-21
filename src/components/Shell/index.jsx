@@ -34,16 +34,12 @@ export default function Shell({ locale }) {
     try {
       setIsLoading(true)
       const res =
-        mode === SIMPLE
+        mode === SIMPLE && !/^\[:find /i.test(q)
           ? await logseq.DB.q(q)
           : await logseq.DB.customQuery(q)
       // Accept only blocks and pages.
       const results = Array.isArray(res)
-        ? mode === SIMPLE
-          ? res.filter((x) => typeof x === "object" && x.uuid)
-          : res
-              .map((item) => item[0])
-              .filter((x) => typeof x === "object" && x.uuid)
+        ? res.filter((x) => typeof x === "object" && x.uuid)
         : []
       setQueryResults(results)
       setResultsSelection(results.map(() => true))
