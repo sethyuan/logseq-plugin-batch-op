@@ -34,7 +34,7 @@ export default function Shell({ locale }) {
     try {
       setIsLoading(true)
       const res =
-        mode === SIMPLE && !/^\[:find /i.test(q)
+        mode === SIMPLE && !/^\s*\[\s*:find /.test(q)
           ? await logseq.DB.q(q)
           : await logseq.DB.customQuery(q)
       // Accept only blocks and pages.
