@@ -14,11 +14,7 @@ export default function App() {
 
   useEffect(() => {
     async function main() {
-      const l10nSetup = setup({
-        urlTemplate:
-          "https://raw.githubusercontent.com/sethyuan/logseq-plugin-batch-op/master/src/translations/${locale}.json",
-        builtinTranslations: { "zh-CN": zhCN },
-      })
+      await setup({ builtinTranslations: { "zh-CN": zhCN } })
 
       logseq.provideStyle(`
         .kef-batchop-icon {
@@ -43,8 +39,6 @@ export default function App() {
           fill: var(--ls-primary-text-color);
         }
       `)
-
-      await l10nSetup
 
       if (logseq.settings?.showButton ?? true) {
         logseq.App.registerUIItem("toolbar", {
