@@ -24,13 +24,14 @@ export default function App() {
           border-radius: 4px;
           justify-content: center;
           align-items: center;
+          color: var(--ls-header-button-background);
         }
         .kef-batchop-icon svg {
           width: 20px;
           height: 20px;
         }
         .kef-batchop-icon svg path {
-          fill: var(--ls-icon-color);
+          fill: currentColor;
         }
         .kef-batchop-icon:hover {
           background: var(--ls-tertiary-background-color);
