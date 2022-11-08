@@ -92,7 +92,7 @@ export default function App() {
 
     const model = {
       showUI() {
-        logseq.showMainUI()
+        logseq.showMainUI({ autoFocus: true })
       },
     }
 
