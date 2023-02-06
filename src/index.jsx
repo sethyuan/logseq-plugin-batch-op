@@ -36,9 +36,6 @@ export default function App() {
         .kef-batchop-icon:hover {
           background: var(--ls-tertiary-background-color);
         }
-        .kef-batchop-icon:hover svg path {
-          fill: var(--ls-primary-text-color);
-        }
       `)
 
       if (logseq.settings?.showButton ?? true) {
