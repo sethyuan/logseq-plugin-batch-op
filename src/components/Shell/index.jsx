@@ -1,9 +1,18 @@
 import { ConfigProvider, message } from "@/components/antd"
 import BatchOps from "@/components/BatchOps"
-import QueryInput, { SIMPLE } from "@/components/QueryInput"
+import QueryInput from "@/components/QueryInput"
 import QueryResult, { PROCESS, RESET } from "@/components/QueryResult"
 import CloseIcon from "@/icons/close.svg"
 import { ShellContext } from "@/libs/contexts"
+import {
+  buildQuery,
+  containsValue,
+  ge,
+  gt,
+  includesValue,
+  le,
+  lt,
+} from "@/libs/query"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { t } from "logseq-l10n"
 import { useCallback, useMemo, useRef, useState } from "preact/hooks"
@@ -30,13 +39,29 @@ export default function Shell({ locale }) {
     escTimer.current = null
   }
 
-  const performQuery = useCallback(async (mode, q) => {
+  const performQuery = useCallback(async (q) => {
     try {
       setIsLoading(true)
-      const res =
-        mode === SIMPLE && !/^\s*\[\s*:find /.test(q)
-          ? await logseq.DB.q(q)
-          : await logseq.DB.customQuery(q)
+      const res = /^\s*\(/.test(q)
+        ? await logseq.DB.q(q)
+        : /^\s*\[\s*:find /.test(q)
+        ? await logseq.DB.customQuery(q)
+        : (
+            await (() => {
+              const [qs] = buildQuery(q)
+              return top.logseq.api.datascript_query(
+                qs,
+                includesValue,
+                containsValue,
+                ge,
+                le,
+                gt,
+                lt,
+              )
+            })()
+          )
+            .flat()
+            .filter((b) => b["pre-block?"] || b.content)
       // Accept only blocks and pages.
       const results = Array.isArray(res)
         ? res.filter((x) => typeof x === "object" && x.uuid)

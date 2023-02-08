@@ -1,0 +1,1 @@
+../../../logseq-plugin-smartsearch/src/libs/query.js
