@@ -4,6 +4,7 @@ import zhCN from "@/translations/zh-CN.json"
 import "@logseq/libs"
 import { setup, t } from "logseq-l10n"
 import { useEffect, useState } from "preact/hooks"
+import { setDateFormat } from "./libs/query"
 
 const BatchSvg = `<svg t="1655087098291" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="950" width="200" height="200"><path d="M768 864a96.2 96.2 0 0 0 27.89-4.11C783.94 899.31 747.32 928 704 928H192c-53.02 0-96-42.98-96-96V320c0-43.32 28.69-79.94 68.11-91.89A96.2 96.2 0 0 0 160 256v512c0 53.02 42.98 96 96 96h512z" p-id="951"></path><path d="M832 96H320c-43.32 0-79.94 28.69-91.89 68.11A96.2 96.2 0 0 0 224 192v512c0 53.02 42.98 96 96 96h512a96.2 96.2 0 0 0 27.89-4.11C899.31 783.94 928 747.32 928 704V192c0-53.02-42.98-96-96-96zM701.42 361.04L497.77 564.69 441.21 576l11.31-56.57 203.65-203.65c12.49-12.49 32.75-12.49 45.25 0 12.5 12.5 12.5 32.76 0 45.26z" p-id="952"></path></svg>`
 
@@ -15,6 +16,9 @@ export default function App() {
   useEffect(() => {
     async function main() {
       await setup({ builtinTranslations: { "zh-CN": zhCN } })
+
+      const { preferredDateFormat } = await logseq.App.getUserConfigs()
+      setDateFormat(preferredDateFormat)
 
       logseq.provideStyle(`
         .kef-batchop-icon {
