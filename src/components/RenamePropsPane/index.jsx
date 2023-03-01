@@ -79,13 +79,15 @@ export default function RenamePropsPane() {
   const renameProps = useCallback(
     async (data, props) => {
       for (let block of data) {
-        if (block.properties == null) continue
+        const properties =
+          block.propertiesTextValues ?? block["properties-text-values"]
+        if (properties == null) continue
         for (const [k, v] of props) {
           await logseq.Editor.removeBlockProperty(block.uuid, k)
           await logseq.Editor.upsertBlockProperty(
             block.uuid,
             v,
-            block.properties[dashToCamel(k)],
+            properties[dashToCamel(k)],
           )
         }
         if (block.page == null) {
@@ -102,7 +104,7 @@ export default function RenamePropsPane() {
             await logseq.Editor.upsertBlockProperty(
               block.uuid,
               v,
-              block.properties[dashToCamel(k)],
+              properties[dashToCamel(k)],
             )
           }
         }
