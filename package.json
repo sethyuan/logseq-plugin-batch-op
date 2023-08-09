@@ -1,6 +1,6 @@
 {
   "name": "logseq-plugin-batch-op",
-  "version": "0.4.5",
+  "version": "0.5.0",
   "main": "dist/index.html",
   "logseq": {
     "id": "_sethyuan-logseq-batch-op",
@@ -21,6 +21,7 @@
     "date-fns": "^2.29.3",
     "immer": "^9.0.15",
     "logseq-l10n": "^0.2.0",
+    "pinyin-pro": "^3.16.2",
     "preact": "^10.7.3",
     "preact-render-to-string": "^5.2.0",
     "rambdax": "^8.0.1",

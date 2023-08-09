@@ -6745,6 +6745,11 @@ pify@^4.0.1:
   resolved "https://registry.npmmirror.com/pify/-/pify-4.0.1.tgz#4b2cd25c50d598735c50292224fd8c6df41e3231"
   integrity sha512-uB80kBFb/tfd68bVleG9T5GGsGPjJrLAUpR5PZIrhBnIaRTQRjqdJSsIKkOP6OAIFbj7GOrcudc5pNjZ+geV2g==
 
+pinyin-pro@^3.16.2:
+  version "3.16.2"
+  resolved "https://registry.npmmirror.com/pinyin-pro/-/pinyin-pro-3.16.2.tgz#700e02c348820037a17434c284f64237e54c0e8a"
+  integrity sha512-0Q+boRY7u0X7NApcS8ZDLWUw0H8PoopaH4yN/KVqeAFsrRTwhKEbv0bG/ZYwLrQRSfGhWEm5wxl/l4qyVQTrnQ==
+
 pkg-dir@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npmmirror.com/pkg-dir/-/pkg-dir-3.0.0.tgz#2749020f239ed990881b1f71210d51eb6523bea3"
@@ -9789,10 +9794,8 @@ watchpack@^1.7.4:
   resolved "https://registry.npmmirror.com/watchpack/-/watchpack-1.7.5.tgz#1267e6c55e0b9b5be44c2023aed5437a2c26c453"
   integrity sha512-9P3MWk6SrKjHsGkLT2KHXdQ/9SNkyoJbabxnKOoJepsvJjJG8uYTR3yTPxPQvNDI3w4Nz1xnE0TLHK4RIVe/MQ==
   dependencies:
-    chokidar "^3.4.1"
     graceful-fs "^4.1.2"
     neo-async "^2.5.0"
-    watchpack-chokidar2 "^2.0.1"
   optionalDependencies:
     chokidar "^3.4.1"
     watchpack-chokidar2 "^2.0.1"

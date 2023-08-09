@@ -1,12 +1,13 @@
-import { ConfigProvider, message } from "@/components/antd"
 import BatchOps from "@/components/BatchOps"
 import QueryInput from "@/components/QueryInput"
 import QueryResult, { PROCESS, RESET } from "@/components/QueryResult"
+import { ConfigProvider, message } from "@/components/antd"
 import CloseIcon from "@/icons/close.svg"
 import { ShellContext } from "@/libs/contexts"
 import {
   buildQuery,
   containsValue,
+  fullTextSearch,
   ge,
   gt,
   includesValue,
@@ -49,15 +50,20 @@ export default function Shell({ locale }) {
         : (
             await (() => {
               const [qs] = buildQuery(q)
-              return top.logseq.api.datascript_query(
-                qs,
-                includesValue,
-                containsValue,
-                ge,
-                le,
-                gt,
-                lt,
-              )
+              const isFullTextSearch = !qs.startsWith("[:find ")
+              if (isFullTextSearch) {
+                return fullTextSearch(qs)
+              } else {
+                return top.logseq.api.datascript_query(
+                  qs,
+                  includesValue,
+                  containsValue,
+                  ge,
+                  le,
+                  gt,
+                  lt,
+                )
+              }
             })()
           )
             .flat()
