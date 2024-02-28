@@ -61,7 +61,7 @@ export default function QueryResult({
               type="primary"
               onClick={mode === PROCESS ? onProcess : onReset}
             >
-              {mode === PROCESS ? t("Process") : t("Reset")}
+              {mode === PROCESS ? t("Process") : t("Reset Query")}
             </Button>
           </div>
         )}
